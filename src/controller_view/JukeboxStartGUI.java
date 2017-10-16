@@ -23,6 +23,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -34,7 +35,7 @@ public class JukeboxStartGUI extends Application {
   
 	// TextFields for User input
 	private TextField name_input;
-	private TextField pswrd_input;
+	private PasswordField pswrd_input;
 	// Buttons for the Login Screen
 	private Button login_button;
 	private Button logout_button;
@@ -76,7 +77,7 @@ public class JukeboxStartGUI extends Application {
 	//	leftSide.setAlignment(Pos.CENTER_RIGHT);
 		
 		name_input = new TextField();
-		pswrd_input = new TextField();
+		pswrd_input = new PasswordField();
 		login_button = new Button("Login");
 		Label login_response = new Label("Hello!");
 		logout_button = new Button("Logout");
@@ -101,7 +102,7 @@ public class JukeboxStartGUI extends Application {
 		userList.add(new User("Devon",22,false));
 		userList.add(new User("River",333,false));
 		userList.add(new User("Ryan",4444,false));
-		userList.add(new User("Merlin",77777,true));
+		userList.add(new User("Merlin",7777777,true));
 	}
 	
 	// called from the start to add all listeners to the model
@@ -117,9 +118,7 @@ public class JukeboxStartGUI extends Application {
 		  
 		for (int i = 0; i < userList.size(); i++){
 			if ((userList.get(i).getID().equals(username)) && (userList.get(i).getPassword() == pswrd))
-				return true;
-			else 
-				return false;	  
+				return true;	  
 		}
 		return false;
 	}
