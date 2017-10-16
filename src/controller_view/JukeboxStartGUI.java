@@ -18,6 +18,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
@@ -27,6 +28,8 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 // Added by Gavin
 import model.User;
@@ -41,8 +44,12 @@ public class JukeboxStartGUI extends Application {
 	private Button logout_button;
 	private Button song1_button;
 	private Button song2_button;
+	private Label login_response;
 	// List of Users 
 	private ArrayList<User> userList;
+	// flag for if a User is logged in
+	private User currentUser;
+	private int num_login_attempts;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -61,37 +68,46 @@ public class JukeboxStartGUI extends Application {
 		GridPane leftSide = new GridPane();
 		GridPane rightSide = new GridPane();
 		GridPane topBar = new GridPane();
+	//	VBox songButtons =  new VBox();
+		currentUser = null;
 		
+//		songButtons.setSpacing(5);
 		song1_button = new Button("Select song 1");
 		song2_button = new Button("Select song 2");
 		topBar.setAlignment(Pos.CENTER);
+		topBar.setHgap(10);
+//		songButtons.getChildren().setAll(song1_button,song2_button);
 		topBar.add(song1_button, 0, 0);
 		topBar.add(song2_button, 1, 0);
 		
 		Label acct_name = new Label("Account Name");
 		Label acct_pswrd = new Label("Password");
-		leftSide.add(acct_name, 0, 0);
-		leftSide.add(acct_pswrd, 0, 1);
-	//	acct_name.setAlignment(Pos.CENTER_RIGHT);
-	//	leftSide.setHgap(5);
-	//	leftSide.setAlignment(Pos.CENTER_RIGHT);
+//		GridPane.setHalignment(acct_name, HPos.RIGHT);
+		//	leftSide.setHgap(5);
+		//	leftSide.setAlignment(Pos.CENTER_RIGHT);
+		leftSide.setVgap(12);
+		leftSide.add(acct_name, 0, 1);
+		leftSide.add(acct_pswrd, 0, 3);
+	
 		
 		name_input = new TextField();
 		pswrd_input = new PasswordField();
 		login_button = new Button("Login");
-		Label login_response = new Label("Hello!");
+		login_response = new Label("Please login first.");
 		logout_button = new Button("Logout");
-		rightSide.add(name_input, 0, 0);
-		rightSide.add(pswrd_input, 0, 1);
-		rightSide.add(login_button, 0, 2);
-		rightSide.add(login_response, 0, 3);
-		rightSide.add(logout_button, 0, 4);
+		rightSide.setVgap(11);
+		rightSide.add(name_input, 0, 1);
+		rightSide.add(pswrd_input, 0, 2);
+		rightSide.add(login_button, 0, 3);
+		rightSide.add(login_response, 0, 4);
+		rightSide.add(logout_button, 0, 5);
 		
 		all.setTop(topBar);
+//		all.setTop(songButtons);
 		all.setLeft(leftSide);
 		all.setRight(rightSide);
 		
-		Scene scene = new Scene(all, 300, 200);
+		Scene scene = new Scene(all, 300, 220);
 		stage.setScene(scene);
 		stage.show();
 	}
@@ -109,18 +125,20 @@ public class JukeboxStartGUI extends Application {
 	private void registerListeners() {
 	//	searchBar.textProperty().addListener(new SearchBarListener());
 		login_button.setOnAction(new LoginButtonListener());
+		logout_button.setOnAction(new LogoutButtonListener());
 	}
 	
 	// function used in LoginButtonListener to verify the user exists in the UserList
-	private boolean verifyUser(String username, String password) {
+	private User verifyUser(String username, String password) {
 		  
 		int pswrd = Integer.parseInt(password);
 		  
 		for (int i = 0; i < userList.size(); i++){
 			if ((userList.get(i).getID().equals(username)) && (userList.get(i).getPassword() == pswrd))
-				return true;	  
+				userList.get(i).setNumLogins(userList.get(i).getNumLogins()+1);
+				return userList.get(i); 
 		}
-		return false;
+		return null;
 	}
 	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
@@ -130,14 +148,39 @@ public class JukeboxStartGUI extends Application {
 			String acct_name_input = name_input.getText();
 			String acct_password_input = pswrd_input.getText();
 			
-			if (verifyUser(acct_name_input, acct_password_input)){
-				System.out.println("User -> " + acct_name_input + " EXISTS");
+			currentUser = verifyUser(acct_name_input, acct_password_input);
+			if (currentUser != null){
+				login_response.setText("Hello! " + acct_name_input);
+				num_login_attempts = 0;
+				clearInputs();
+				System.out.println("***** Num. times logged in:  " + currentUser.getNumLogins() + "  *****");
 			}
 			else {
-				System.out.println("Incorrect username or password. Try again.");
+				num_login_attempts++;
+				login_response.setText("Incorrect username or password. Try again.");
+				System.out.println("***** Num. attempts left:  " + (3-num_login_attempts) + "  *****");
 			}
-			System.out.println("*************************");
+			
+		}
+		// clears Inputs
+		private void clearInputs(){
+			name_input.clear();
+			pswrd_input.clear();
 		}
 	}
+	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+		private class LogoutButtonListener implements EventHandler<ActionEvent> {
+			@Override
+			public void handle(ActionEvent event) {
+				
+				if (currentUser != null){
+					login_response.setText("Good-bye! " + currentUser.getID());
+				}
+				else {
+					login_response.setText("Please login first.");
+				}
+			}
+		}
+	
 	/*************** END of CLASS : JukeBoxStartGUI ****************/  
 }
