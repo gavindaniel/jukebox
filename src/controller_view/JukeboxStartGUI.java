@@ -183,7 +183,12 @@ public class JukeboxStartGUI extends Application {
 		for (int i = 0; i < userList.size(); i++){
 			if ((userList.get(i).getID().equals(username)))
 			{
-				userList.remove(i);
+				if (userList.get(i).getAdminAccess() == false) {
+					userList.remove(i);
+					login_response.setText("User (" + username + ") removed.");
+				}
+				else 
+					login_response.setText("Cannot remove admin (" + username + ")");
 			}
 		}
 	}
@@ -321,7 +326,6 @@ public class JukeboxStartGUI extends Application {
 			
 			if (userExists) {
 				removeUser(acct_name_input);
-				login_response.setText("User (" + acct_name_input + ") removed.");
 				clearInputs();
 			}
 			else {
