@@ -2,7 +2,6 @@ package model;
 // Added to allow package model to exist on GitHub
 
 import java.io.File;
-import java.net.URI;
 
 /**
  * Holds essential information about a song and provides functionality to

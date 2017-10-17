@@ -15,8 +15,11 @@ import java.util.ArrayList;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -29,6 +32,7 @@ import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
 import model.Song;
+import model.SongQueue;
 // Added by Gavin
 import model.User;
 
@@ -53,7 +57,7 @@ public class JukeboxStartGUI extends Application {
 	private Button song1_button;
 	private Button song2_button;
 	// ListView for song queue
-	private ListView<String> songList;
+	private ListView<String> songListView;
 	// List of Users 
 	private ArrayList<User> userList;
 	// login tracker(s)
@@ -88,25 +92,7 @@ public class JukeboxStartGUI extends Application {
 		topBar.add(song1_button, 0, 0);
 		topBar.add(song2_button, 1, 0);
 		
-		// Set up Login Fields
-		acct_name = new Label("Account Name");
-		acct_pswrd = new Label("\tPassword");
-		leftSide.setVgap(12);
-		leftSide.setHgap(20);
-		leftSide.add(acct_name, 1, 1);
-		leftSide.add(acct_pswrd, 1, 3);
-	
-		name_input = new TextField();
-		pswrd_input = new PasswordField();
-		login_button = new Button("Login");
-		login_response = new Label("Please login first.");
-		logout_button = new Button("Logout");
-		rightSide.setVgap(11);
-		rightSide.add(name_input, 0, 1);
-		rightSide.add(pswrd_input, 0, 2);
-		rightSide.add(login_button, 0, 3);
-		rightSide.add(login_response, 0, 4);
-		rightSide.add(logout_button, 0, 5);
+		setupLoginView();
 		
 		setupSongListView();
 		
@@ -115,18 +101,39 @@ public class JukeboxStartGUI extends Application {
 		all.setRight(rightSide);
 		all.setBottom(bottomBox);
 		
-		Scene scene = new Scene(all, 500, 500);
+		Scene scene = new Scene(all, 600, 500);
 		stage.setScene(scene);
 		stage.show();
 	}
 	
+	private void setupLoginView() {
+
+		name_input = new TextField();
+		pswrd_input = new PasswordField();
+		login_button = new Button("Login");
+		login_response = new Label("Please login first.");
+		logout_button = new Button("Logout");
+		acct_name = new Label("Account Name");
+		acct_pswrd = new Label("\tPassword");
+		
+		leftSide.setVgap(12);
+		leftSide.setHgap(20);
+		leftSide.add(acct_name, 1, 1);
+		leftSide.add(acct_pswrd, 1, 3);
+		leftSide.add(name_input, 2, 1);
+		leftSide.add(pswrd_input, 2, 3);
+	
+		rightSide.setVgap(11);
+		rightSide.add(login_button, 0, 1);
+		rightSide.add(login_response, 0, 2);
+		rightSide.add(logout_button, 0, 3);
+		rightSide.setPadding(new Insets(0,40,0,0));
+	}
+	
 	private void setupSongListView() {
 		//Set up view for queue
-		songList = new ListView<>();
-		songList.getItems().add("Song1");
-		songList.getItems().add("Song2");
-		songList.getItems().add("Song3");
-		bottomBox.getChildren().add(songList);
+		songListView = new ListView<>();
+		bottomBox.getChildren().add(songListView);
 	}
 	
 	// called from the start to populates the UserList 
@@ -342,38 +349,70 @@ public class JukeboxStartGUI extends Application {
 	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class SongButtonListener implements EventHandler<ActionEvent> {
-		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
-		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
-//		File file1 = new File(song1.getFilePath());
-//		File file2 = new File(song2.getFilePath());
-//		URI uri1 = file1.toURI();
-//		URI uri2 = file2.toURI();
-//		Media media1 = new Media(uri1.toString());
-//		Media media2 = new Media(uri2.toString());
-		Media media1 = new Media(song1.getPlayableSource());
-		Media media2 = new Media(song2.getPlayableSource());
-		MediaPlayer mediaPlayer1 = new MediaPlayer(media1);
-		MediaPlayer mediaPlayer2 = new MediaPlayer(media2);
-//		mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
+		
+		private Song song;
 		
 		@Override
 		public void handle(ActionEvent event) {
-//			mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
+			
 			if (event.getSource().toString().contains("Select song 1")) {
-				System.out.println("Song 1 selected");
-				mediaPlayer1 = new MediaPlayer(media1);
-				mediaPlayer1.play();
-				mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
-				song1.setNumTimesPlayed(song1.getNumTimesPlayed()+1);
-				System.out.println("Media Player 1 playCount: " + song1.getNumTimesPlayed());
+				
+				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
+				
+				//Add song to queue and play immediately if queue is empty
+				SongQueue currentQueue = currentUser.getSongQueue();
+				String addStatus = currentQueue.addSong(song);
+				
+				if (addStatus.compareTo("Success") == 0) {
+					
+					songListView.getItems().add(song.getTitle());
+					
+					if (currentQueue.getQueueOfSongs().size() == 1) {
+						
+						SongPlayer songPlayer = new SongPlayer(song);
+						songPlayer.playSong();
+						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+						
+					}
+				}
+				
+				else {
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Not Allowed");
+					alert.setHeaderText(addStatus);
+					alert.showAndWait();
+				}
+				
 			}
+			
 			else if (event.getSource().toString().contains("Select song 2")) {
-				System.out.println("Song 2 selected");
-				mediaPlayer2 = new MediaPlayer(media2);
-				mediaPlayer2.setOnEndOfMedia(new EndOfSongHandler());
-				mediaPlayer2.play();
-				song2.setNumTimesPlayed(song2.getNumTimesPlayed()+1);
-				System.out.println("Media Player 2 playCount: " + song2.getNumTimesPlayed());
+
+				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
+
+				//Add song to queue and play immediately if queue is empty
+				SongQueue currentQueue = currentUser.getSongQueue();
+				String addStatus = currentQueue.addSong(song);
+
+				if (addStatus.compareTo("Success") == 0) {
+
+					songListView.getItems().add(song.getTitle());
+
+					if (currentQueue.getQueueOfSongs().size() == 1) {
+
+						SongPlayer songPlayer = new SongPlayer(song);
+						songPlayer.playSong();
+						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+
+					}
+					
+					}
+				
+				else {
+					Alert alert = new Alert(AlertType.INFORMATION);
+					alert.setTitle("Not Allowed");
+					alert.setHeaderText(addStatus);
+					alert.showAndWait();
+				}
 			}
 			
 		}
@@ -382,17 +421,47 @@ public class JukeboxStartGUI extends Application {
 	private class EndOfSongHandler implements Runnable {
 	    @Override
 	    public void run() {
-//	    	System.out.println(this.toString());
 	    	System.out.println("Song ended");
+	    	currentUser.getSongQueue().removeLastPlayedSong();
+	    	songListView.getItems().remove(0);
+	    	playNextSong();
+	    }
+	    
+	    private void playNextSong() {
 	    	
-	//      songsPlayed++;
-	//      Alert alert = new Alert(AlertType.INFORMATION);
-	//      alert.setTitle("Message");
-	//      alert.setHeaderText("Song ended, can now play song #" + songsPlayed);
-	//      alert.showAndWait();
-	      
+	    	Song nextSong = currentUser.getSongQueue().serveNextSong();
+	    	
+	    	if (nextSong != null) {
+	    		SongPlayer songPlayer = new SongPlayer(nextSong);
+				songPlayer.playSong();
+				songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+	    	}
+	    	
 	    }
 	  }
+	
+	private static class SongPlayer {
+		
+		private Song song;
+		private Media songMedia;
+		private static MediaPlayer mediaPlayer;
+		
+		public SongPlayer(Song song) {			
+			this.song = song;
+			this.songMedia = new Media(this.song.getPlayableSource());
+			SongPlayer.mediaPlayer = new MediaPlayer(songMedia);
+		}
+		
+		public MediaPlayer getMediaPlayer() {
+			return SongPlayer.mediaPlayer;
+		}
+		
+		public void playSong() {
+			SongPlayer.mediaPlayer.play();
+		}
+	}
+	
+	
 	
 	/*************** END of CLASS : JukeBoxStartGUI ****************/  
 }

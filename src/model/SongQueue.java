@@ -12,7 +12,7 @@ import java.util.Queue;
  */
 public class SongQueue {
 
-	private Queue<Song> songQueue;
+	private Queue<Song> queueOfSongs;
 	private int NumSongsSelected;
 	private int minsRemaining;
 	private LocalDate mostRecentSelection;
@@ -20,12 +20,26 @@ public class SongQueue {
 
 	//Constructor instantiates an LinkedList object implementing the Queue
 	public SongQueue() {
-		this.songQueue = new LinkedList<>();
+		this.queueOfSongs = new LinkedList<>();
 		this.NumSongsSelected = 0;
 		this.minsRemaining = 1500;
 		this.mostRecentSelection = LocalDate.now();
 	}
-
+	
+	// Getters
+	public Queue<Song> getQueueOfSongs() {
+		return this.queueOfSongs;
+	}
+	public int getNumSongsSelected() {
+		return this.NumSongsSelected;
+	}
+	public int getMinsRemaining() {
+		return this.minsRemaining;
+	}
+	public LocalDate getMostRecentSelection() {
+		return this.mostRecentSelection;
+	}
+	
 	/**
 	 * If song passes validation, it is added to the song queue to be played.
 	 * Otherwise an error message is returned.
@@ -39,7 +53,7 @@ public class SongQueue {
 		int valid = validateSong(song);
 		
 		if (valid == 0) {
-			songQueue.add(song);
+			queueOfSongs.add(song);
 			NumSongsSelected++;
 			minsRemaining -= song.getSongLength();
 			song.incrementNumPlays();
@@ -82,9 +96,13 @@ public class SongQueue {
 		return 0;
 	}
 	
-	//Removes and return Song from head of queue. Returns null if queue is empty.
-	public Song playSong() {
-		return songQueue.poll();
+	//Returns Song from head of queue. Returns null if queue is empty.
+	public Song serveNextSong() {
+		return queueOfSongs.peek();
+	}
+	//Returns and removes Song from head of queue. Returns null if queue is empty.
+	public Song removeLastPlayedSong() {
+		return queueOfSongs.poll();
 	}
 	
 	
