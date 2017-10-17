@@ -309,7 +309,7 @@ public class JukeboxStartGUI extends Application {
 			}
 		}
 	}
-	
+	// hi :-)
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class RemoveButtonListener implements EventHandler<ActionEvent> {
 		@Override
