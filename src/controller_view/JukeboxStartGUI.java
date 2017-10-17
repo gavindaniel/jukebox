@@ -45,6 +45,14 @@ import model.User;
 
 public class JukeboxStartGUI extends Application {
   
+	// BorderPane and GridPanes
+	private BorderPane all;
+	private GridPane topBar;
+	private GridPane leftSide;
+	private GridPane rightSide;
+	// Labels for inputs
+	private Label acct_name;
+	private Label acct_pswrd;
 	// TextFields for User input
 	private TextField name_input;
 	private PasswordField pswrd_input;
@@ -73,10 +81,10 @@ public class JukeboxStartGUI extends Application {
 	  
 	//Place components
 	private void layoutGUI_setupModel(Stage stage) {
-		BorderPane all = new BorderPane();
-		GridPane leftSide = new GridPane();
-		GridPane rightSide = new GridPane();
-		GridPane topBar = new GridPane();
+		all = new BorderPane();
+		leftSide = new GridPane();
+		rightSide = new GridPane();
+		topBar = new GridPane();
 		currentUser = null;
 		
 		
@@ -88,8 +96,8 @@ public class JukeboxStartGUI extends Application {
 		topBar.add(song2_button, 1, 0);
 		
 		
-		Label acct_name = new Label("Account Name");
-		Label acct_pswrd = new Label("Password");
+		acct_name = new Label("Account Name");
+		acct_pswrd = new Label("Password");
 		leftSide.setVgap(12);
 		leftSide.add(acct_name, 0, 1);
 		leftSide.add(acct_pswrd, 0, 3);
@@ -127,7 +135,6 @@ public class JukeboxStartGUI extends Application {
 	
 	// called from the start to add all listeners to the model
 	private void registerListeners() {
-	//	searchBar.textProperty().addListener(new SearchBarListener());
 		login_button.setOnAction(new LoginButtonListener());
 		logout_button.setOnAction(new LogoutButtonListener());
 		song1_button.setOnAction(new SongButtonListener());
@@ -137,8 +144,6 @@ public class JukeboxStartGUI extends Application {
 	// function used in LoginButtonListener to verify the user exists in the UserList
 	private User verifyUser(String username, String password) {
 		  
-		
-		 
 		try {
 			int pswrd = Integer.parseInt(password);
 			for (int i = 0; i < userList.size(); i++){
@@ -156,6 +161,58 @@ public class JukeboxStartGUI extends Application {
 		return null;
 	}
 	
+	// function to check if Username is already taken
+	private boolean checkUsernameTaken(String username) {
+		for (int i = 0; i < userList.size(); i++){
+			if ((userList.get(i).getID().equals(username)))
+			{
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	// function to check if Username is already taken
+	private void addUser(String username, int password) {
+		User newUser = new User(username,password,false);
+		userList.add(newUser);
+	}
+		
+	// function to check if Username is already taken
+	private void removeUser(String username) {
+		for (int i = 0; i < userList.size(); i++){
+			if ((userList.get(i).getID().equals(username)))
+			{
+				userList.remove(i);
+			}
+		}
+	}
+		
+	// function to add the Add/Drop buttons for when an admin logs-in.
+	private void addAdminButtons() {
+		Button addButton = new Button("Add");
+		addButton.setOnAction(new AddButtonListener());
+		Button removeButton = new Button("Remove");
+		removeButton.setOnAction(new RemoveButtonListener());
+		leftSide.add(addButton, 0, 4);
+		leftSide.add(removeButton, 0, 5);
+	}
+	
+	// function to remove the Add/Drop buttons for when an admin logs-out.
+	private void removeAdminButtons() {
+		all.setLeft(null);
+		leftSide = new GridPane();
+		leftSide.setVgap(12);
+		leftSide.add(acct_name, 0, 1);
+		leftSide.add(acct_pswrd, 0, 3);
+		all.setLeft(leftSide);
+	}
+	// clears Inputs
+	private void clearInputs(){
+		name_input.clear();
+		pswrd_input.clear();
+	}
+	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class LoginButtonListener implements EventHandler<ActionEvent> {
 		@Override
@@ -167,27 +224,32 @@ public class JukeboxStartGUI extends Application {
 				login_response.setText("Missing name/password.");
 				System.out.println(acct_name_input);
 				System.out.println(acct_password_input);
+				return; // EXIT : ERROR
+			}
+			
+			if (currentUser == null) {
 				currentUser = verifyUser(acct_name_input, acct_password_input);
 			}
 			else {
-				if (currentUser != null){
-					login_response.setText("Hello! " + acct_name_input);
-					num_login_attempts = 0;
-					clearInputs();
-					System.out.println("***** Num. times logged in:  " + currentUser.getNumLogins() + "  *****");
-				}
-				else {
-					num_login_attempts++;
-					login_response.setText("Incorrect. " + (3-num_login_attempts) + " attempt(s) left");
-	//				System.out.println("***** Num. attempts left:  " + (3-num_login_attempts) + "  *****");
-				}
+				login_response.setText("User (" + currentUser.getID() + ") logged-in");
+				return;
 			}
 			
-		}
-		// clears Inputs
-		private void clearInputs(){
-			name_input.clear();
-			pswrd_input.clear();
+			
+			if (currentUser != null){
+				login_response.setText("Hello! " + acct_name_input);
+				num_login_attempts = 0;
+				clearInputs();
+				System.out.println("***** Num. times logged in:  " + currentUser.getNumLogins() + "  *****");
+				if (currentUser.getAdminAccess()) {
+					addAdminButtons();
+				}
+			}
+			else {
+				num_login_attempts++;
+				login_response.setText("Incorrect. " + (3-num_login_attempts) + " attempt(s) left");
+//				System.out.println("***** Num. attempts left:  " + (3-num_login_attempts) + "  *****");
+			}	
 		}
 	}
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
@@ -197,12 +259,78 @@ public class JukeboxStartGUI extends Application {
 			
 			if (currentUser != null){
 				login_response.setText("Good-bye! " + currentUser.getID());
+				if (currentUser.getAdminAccess()) {
+					removeAdminButtons();
+				}
+				currentUser = null;
 			}
 			else {
 				login_response.setText("Please login first.");
 			}
 		}
 	}
+	
+	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+	private class AddButtonListener implements EventHandler<ActionEvent> {
+		@Override
+		public void handle(ActionEvent event) {
+			String acct_name_input = name_input.getText();
+			String acct_password_input = pswrd_input.getText();
+			
+			if (acct_name_input.equals("") || acct_password_input.equals("")){
+				login_response.setText("Missing name/password.");
+				System.out.println(acct_name_input);
+				System.out.println(acct_password_input);
+				return; // EXIT : ERROR
+			}
+			
+			boolean userTaken = checkUsernameTaken(acct_name_input);
+			if (userTaken) {
+				login_response.setText("Username (" + acct_name_input + ") taken.");
+			}
+			else {
+				currentUser = verifyUser(acct_name_input, acct_password_input);
+			}
+			
+			
+			if (currentUser == null){ // User does not exist
+				addUser(acct_name_input, Integer.parseInt(acct_password_input));
+				login_response.setText("User (" + acct_name_input + ") added.");
+				clearInputs();
+			}
+			else {
+				login_response.setText("User (" + currentUser.getID() + ") exists");
+				clearInputs();
+			}
+		}
+	}
+	
+	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+	private class RemoveButtonListener implements EventHandler<ActionEvent> {
+		@Override
+		public void handle(ActionEvent event) {
+			String acct_name_input = name_input.getText();
+			
+			if (acct_name_input.equals("")){
+				login_response.setText("Missing username.");
+				System.out.println(acct_name_input);
+				return; // EXIT : ERROR
+			}
+			
+			boolean userExists = checkUsernameTaken(acct_name_input);
+			
+			if (userExists) {
+				removeUser(acct_name_input);
+				login_response.setText("User (" + acct_name_input + ") removed.");
+				clearInputs();
+			}
+			else {
+				login_response.setText("User (" + acct_name_input + ") DNE.");
+				clearInputs();
+			}
+		}
+	}
+	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class SongButtonListener implements EventHandler<ActionEvent> {
 		Song song1 = new Song("SwingCheese.mp3");
