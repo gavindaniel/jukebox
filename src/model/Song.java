@@ -19,4 +19,7 @@ public class Song {
 	public int getNumTimesPlayed() {
 		return this.num_times_played;
 	}
+	public void setNumTimesPlayed(int n) {
+		this.num_times_played = n;
+	}
 }

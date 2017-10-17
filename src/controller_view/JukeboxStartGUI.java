@@ -50,9 +50,10 @@ public class JukeboxStartGUI extends Application {
 	private GridPane topBar;
 	private GridPane leftSide;
 	private GridPane rightSide;
-	// Labels for inputs
+	// Labels 
 	private Label acct_name;
 	private Label acct_pswrd;
+	private Label login_response;
 	// TextFields for User input
 	private TextField name_input;
 	private PasswordField pswrd_input;
@@ -61,10 +62,9 @@ public class JukeboxStartGUI extends Application {
 	private Button logout_button;
 	private Button song1_button;
 	private Button song2_button;
-	private Label login_response;
 	// List of Users 
 	private ArrayList<User> userList;
-	// flag for if a User is logged in
+	// login tracker(s)
 	private User currentUser;
 	private int num_login_attempts;
 	
@@ -97,10 +97,11 @@ public class JukeboxStartGUI extends Application {
 		
 		
 		acct_name = new Label("Account Name");
-		acct_pswrd = new Label("Password");
+		acct_pswrd = new Label("\tPassword");
 		leftSide.setVgap(12);
-		leftSide.add(acct_name, 0, 1);
-		leftSide.add(acct_pswrd, 0, 3);
+		leftSide.setHgap(20);
+		leftSide.add(acct_name, 1, 1);
+		leftSide.add(acct_pswrd, 1, 3);
 	
 		
 		name_input = new TextField();
@@ -142,7 +143,7 @@ public class JukeboxStartGUI extends Application {
 	}
 	
 	// function used in LoginButtonListener to verify the user exists in the UserList
-	private User verifyUser(String username, String password) {
+	private User findUser(String username, String password) {
 		  
 		try {
 			int pswrd = Integer.parseInt(password);
@@ -155,7 +156,7 @@ public class JukeboxStartGUI extends Application {
 			}
 		}
 		catch (Exception e){
-			System.out.println("ERROR " + e);
+			System.out.println("*** EXCEPTION THROWN: " + e.getMessage());
 		}
 		
 		return null;
@@ -199,8 +200,8 @@ public class JukeboxStartGUI extends Application {
 		addButton.setOnAction(new AddButtonListener());
 		Button removeButton = new Button("Remove");
 		removeButton.setOnAction(new RemoveButtonListener());
-		leftSide.add(addButton, 0, 4);
-		leftSide.add(removeButton, 0, 5);
+		leftSide.add(addButton, 1, 5);
+		leftSide.add(removeButton, 1, 6);
 	}
 	
 	// function to remove the Add/Drop buttons for when an admin logs-out.
@@ -208,8 +209,9 @@ public class JukeboxStartGUI extends Application {
 		all.setLeft(null);
 		leftSide = new GridPane();
 		leftSide.setVgap(12);
-		leftSide.add(acct_name, 0, 1);
-		leftSide.add(acct_pswrd, 0, 3);
+		leftSide.setHgap(20);
+		leftSide.add(acct_name, 1, 1);
+		leftSide.add(acct_pswrd, 1, 3);
 		all.setLeft(leftSide);
 	}
 	// clears Inputs
@@ -224,23 +226,22 @@ public class JukeboxStartGUI extends Application {
 		public void handle(ActionEvent event) {
 			String acct_name_input = name_input.getText();
 			String acct_password_input = pswrd_input.getText();
-			
+			// check if the user filled in both input fields
 			if (acct_name_input.equals("") || acct_password_input.equals("")){
 				login_response.setText("Missing name/password.");
 				System.out.println(acct_name_input);
 				System.out.println(acct_password_input);
 				return; // EXIT : ERROR
 			}
-			
+			// check if someone is already logged in before trying to log-in
 			if (currentUser == null) {
-				currentUser = verifyUser(acct_name_input, acct_password_input);
+				currentUser = findUser(acct_name_input, acct_password_input);
 			}
 			else {
-				login_response.setText("User (" + currentUser.getID() + ") logged-in");
+				login_response.setText("logout first -> (" + currentUser.getID() + ")");
 				return;
 			}
-			
-			
+			// if no one is logged in, check if the user attempting to login actually exists
 			if (currentUser != null){
 				login_response.setText("Hello! " + acct_name_input);
 				num_login_attempts = 0;
@@ -253,7 +254,6 @@ public class JukeboxStartGUI extends Application {
 			else {
 				num_login_attempts++;
 				login_response.setText("Incorrect. " + (3-num_login_attempts) + " attempt(s) left");
-//				System.out.println("***** Num. attempts left:  " + (3-num_login_attempts) + "  *****");
 			}	
 		}
 	}
@@ -294,7 +294,7 @@ public class JukeboxStartGUI extends Application {
 				login_response.setText("Username (" + acct_name_input + ") taken.");
 			}
 			else {
-				currentUser = verifyUser(acct_name_input, acct_password_input);
+				currentUser = findUser(acct_name_input, acct_password_input);
 			}
 			
 			
@@ -337,7 +337,7 @@ public class JukeboxStartGUI extends Application {
 	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class SongButtonListener implements EventHandler<ActionEvent> {
-		Song song1 = new Song("SwingCheese.mp3");
+		Song song1 = new Song("LopingSting.mp3");
 		Song song2 = new Song("Capture.mp3");
 		File file1 = new File(song1.getFilePath());
 		File file2 = new File(song2.getFilePath());
@@ -346,21 +346,27 @@ public class JukeboxStartGUI extends Application {
 		Media media1 = new Media(uri1.toString());
 		Media media2 = new Media(uri2.toString());
 		MediaPlayer mediaPlayer1 = new MediaPlayer(media1);
+		MediaPlayer mediaPlayer2 = new MediaPlayer(media2);
+//		mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
 		
 		@Override
 		public void handle(ActionEvent event) {
-			
+//			mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
 			if (event.getSource().toString().contains("Select song 1")) {
 				System.out.println("Song 1 selected");
 				mediaPlayer1 = new MediaPlayer(media1);
 				mediaPlayer1.play();
 				mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
+				song1.setNumTimesPlayed(song1.getNumTimesPlayed()+1);
+				System.out.println("Media Player 1 playCount: " + song1.getNumTimesPlayed());
 			}
 			else if (event.getSource().toString().contains("Select song 2")) {
 				System.out.println("Song 2 selected");
-				mediaPlayer1 = new MediaPlayer(media2);
-				mediaPlayer1.play();
-				mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
+				mediaPlayer2 = new MediaPlayer(media2);
+				mediaPlayer2.setOnEndOfMedia(new EndOfSongHandler());
+				mediaPlayer2.play();
+				song2.setNumTimesPlayed(song2.getNumTimesPlayed()+1);
+				System.out.println("Media Player 2 playCount: " + song2.getNumTimesPlayed());
 			}
 			
 		}
@@ -371,6 +377,7 @@ public class JukeboxStartGUI extends Application {
 	    public void run() {
 //	    	System.out.println(this.toString());
 	    	System.out.println("Song ended");
+	    	
 	//      songsPlayed++;
 	//      Alert alert = new Alert(AlertType.INFORMATION);
 	//      alert.setTitle("Message");
