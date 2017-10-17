@@ -16,7 +16,7 @@ import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -28,6 +28,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
@@ -40,7 +41,7 @@ public class JukeboxStartGUI extends Application {
   
 	// BorderPane, GridPanes, and HBox
 	private BorderPane all;
-	private GridPane topBar;
+	private VBox buttonBox;
 	private GridPane leftSide;
 	private GridPane rightSide;
 	private HBox bottomBox;
@@ -72,7 +73,6 @@ public class JukeboxStartGUI extends Application {
 	public void start(Stage primaryStage) throws Exception {
 		populateUserList();
 		layoutGUI_setupModel(primaryStage);
-		registerListeners();
 	}
 	  
 	//Place components
@@ -80,26 +80,11 @@ public class JukeboxStartGUI extends Application {
 		all = new BorderPane();
 		leftSide = new GridPane();
 		rightSide = new GridPane();
-		topBar = new GridPane();
+		buttonBox = new VBox();
 		bottomBox = new HBox();
 		currentUser = null;
 		
-		
-		song1_button = new Button("Select song 1");
-		song2_button = new Button("Select song 2");
-		topBar.setAlignment(Pos.CENTER);
-		topBar.setHgap(10);
-		topBar.add(song1_button, 0, 0);
-		topBar.add(song2_button, 1, 0);
-		
 		setupLoginView();
-		
-		setupSongListView();
-		
-		all.setTop(topBar);
-		all.setLeft(leftSide);
-		all.setRight(rightSide);
-		all.setBottom(bottomBox);
 		
 		Scene scene = new Scene(all, 600, 500);
 		stage.setScene(scene);
@@ -128,15 +113,54 @@ public class JukeboxStartGUI extends Application {
 		rightSide.add(login_response, 0, 2);
 		rightSide.add(logout_button, 0, 3);
 		rightSide.setPadding(new Insets(0,40,0,0));
+		
+		all.setLeft(leftSide);
+		all.setRight(rightSide);
+		
+		registerLoginListeners();
 	}
 	
-	private void setupSongListView() {
-		//Set up view for queue
+	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
+	private void setupUserPlaylist() {
+
+		//Set up ListView for song queue
 		songListView = new ListView<>();
+		
+		//Set up song selection buttons
+		song1_button = new Button("Loping Sting");
+		song2_button = new Button("Pokemon Capture");
+		buttonBox.getChildren().add(song1_button);
+		buttonBox.getChildren().add(song2_button);
+		buttonBox.setSpacing(15);
+		
+		//Setting width of buttons to be equal
+		for (Node node : buttonBox.getChildren()) {
+			Button button = (Button) node;
+			button.setMaxWidth(500);
+		}
+		
+		//Register handlers for buttons
+		registerButtonListeners();
+		
+		//Add list and button to bottomBox
 		bottomBox.getChildren().add(songListView);
+		bottomBox.getChildren().add(buttonBox);
+		bottomBox.setSpacing(30);
+		bottomBox.setPadding(new Insets(40,0,0,0));
+		
+		//Add Box to bottom of borderPane
+		all.setBottom(bottomBox);
+
 	}
 	
-	// called from the start to populates the UserList 
+	private void removeUserPlaylist() {
+		
+		all.setBottom(null);
+		bottomBox.getChildren().clear();
+		buttonBox.getChildren().clear();
+	}
+		
+	//Called from the start to populates the UserList 
 	private void populateUserList() {
 		userList = new ArrayList<User>();
 		userList.add(new User("Chris",1,false));
@@ -146,13 +170,19 @@ public class JukeboxStartGUI extends Application {
 		userList.add(new User("Merlin",7777777,true));
 	}
 	
-	// called from the start to add all listeners to the model
-	private void registerListeners() {
+	// called from the start to register login listeners to the model
+	private void registerLoginListeners() {
 		login_button.setOnAction(new LoginButtonListener());
 		logout_button.setOnAction(new LogoutButtonListener());
+	}
+
+	// called from the start to register song button listeners to the model
+	private void registerButtonListeners() {
 		song1_button.setOnAction(new SongButtonListener());
 		song2_button.setOnAction(new SongButtonListener());
 	}
+	
+	
 	
 	// function used in LoginButtonListener to verify the user exists in the UserList
 	private User findUser(String username, String password) {
@@ -248,6 +278,7 @@ public class JukeboxStartGUI extends Application {
 			// check if someone is already logged in before trying to log-in
 			if (currentUser == null) {
 				currentUser = findUser(acct_name_input, acct_password_input);
+				if (currentUser != null) setupUserPlaylist();
 			}
 			else {
 				login_response.setText("logout first -> (" + currentUser.getID() + ")");
@@ -280,6 +311,7 @@ public class JukeboxStartGUI extends Application {
 					removeAdminButtons();
 				}
 				currentUser = null;
+				removeUserPlaylist();
 			}
 			else {
 				login_response.setText("Please login first.");
@@ -355,7 +387,7 @@ public class JukeboxStartGUI extends Application {
 		@Override
 		public void handle(ActionEvent event) {
 			
-			if (event.getSource().toString().contains("Select song 1")) {
+			if (event.getSource().toString().contains("Loping Sting")) {
 				
 				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
 				
@@ -372,7 +404,6 @@ public class JukeboxStartGUI extends Application {
 						SongPlayer songPlayer = new SongPlayer(song);
 						songPlayer.playSong();
 						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-						
 					}
 				}
 				
@@ -385,7 +416,7 @@ public class JukeboxStartGUI extends Application {
 				
 			}
 			
-			else if (event.getSource().toString().contains("Select song 2")) {
+			else if (event.getSource().toString().contains("Pokemon Capture")) {
 
 				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
 
@@ -402,11 +433,10 @@ public class JukeboxStartGUI extends Application {
 						SongPlayer songPlayer = new SongPlayer(song);
 						songPlayer.playSong();
 						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+					}
 
-					}
-					
-					}
-				
+				}
+
 				else {
 					Alert alert = new Alert(AlertType.INFORMATION);
 					alert.setTitle("Not Allowed");

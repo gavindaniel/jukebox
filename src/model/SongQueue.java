@@ -14,7 +14,7 @@ public class SongQueue {
 
 	private Queue<Song> queueOfSongs;
 	private int NumSongsSelected;
-	private int minsRemaining;
+	private int timeRemaining;	//Seconds
 	private LocalDate mostRecentSelection;
 	public final static int MAX = 3;
 
@@ -22,7 +22,7 @@ public class SongQueue {
 	public SongQueue() {
 		this.queueOfSongs = new LinkedList<>();
 		this.NumSongsSelected = 0;
-		this.minsRemaining = 1500;
+		this.timeRemaining = 1500*60;
 		this.mostRecentSelection = LocalDate.now();
 	}
 	
@@ -34,7 +34,10 @@ public class SongQueue {
 		return this.NumSongsSelected;
 	}
 	public int getMinsRemaining() {
-		return this.minsRemaining;
+		return this.timeRemaining/60;
+	}
+	public int getSecondsRemaining() {
+		return this.timeRemaining;
 	}
 	public LocalDate getMostRecentSelection() {
 		return this.mostRecentSelection;
@@ -55,7 +58,7 @@ public class SongQueue {
 		if (valid == 0) {
 			queueOfSongs.add(song);
 			NumSongsSelected++;
-			minsRemaining -= song.getSongLength();
+			timeRemaining -= song.getSongLength();
 			song.incrementNumPlays();
 			
 			return "Success";
@@ -66,7 +69,7 @@ public class SongQueue {
 			
 			else if (valid == 2) return "Song has already been played maximum amount of times.";
 			
-			else return "Only " + minsRemaining + "minutes left in account.\nSong is too long to add to queue";	
+			else return timeRemaining + " minutes left in account.\nSong is too long to add to queue";	
 		}
 	}
 
@@ -91,7 +94,7 @@ public class SongQueue {
 
 		if (song.getNumTimesPlayed() >= MAX) return 2;
 
-		if (minsRemaining*60 < song.getSongLength()) return 3;
+		if (timeRemaining < song.getSongLength()) return 3;
 
 		return 0;
 	}
