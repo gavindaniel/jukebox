@@ -5,6 +5,7 @@ public class User {
 	private int password;
 	private boolean admin_access;
 	private int num_logins;
+	private SongQueue mySongQueue;
 	
 	// default constructor
 	public User() {
@@ -12,6 +13,7 @@ public class User {
 		this.password = -9999;
 		this.admin_access = false;
 		this.num_logins = 0;
+		mySongQueue = new SongQueue();
 	}
 	// pre-defined constructor
 	public User(String id, int pswrd, boolean admin){
@@ -19,6 +21,7 @@ public class User {
 		this.password = pswrd;
 		this.admin_access = admin;
 		this.num_logins = 0;
+		mySongQueue = new SongQueue();
 	}
 	
 	public String getID() {
@@ -33,7 +36,12 @@ public class User {
 	public int getNumLogins() {
 		return this.num_logins;
 	}
+	public SongQueue getSongQueue() {
+		return mySongQueue;
+	}
 	public void setNumLogins(int n) {
 		this.num_logins = n;
 	}
+	
+	
 }

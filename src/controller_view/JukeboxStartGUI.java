@@ -1,12 +1,7 @@
 package controller_view;
 
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URI;
-import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * This program is a functional spike to determine the interactions are 
@@ -18,26 +13,20 @@ import java.util.Arrays;
 
 // Given by Rick
 import javafx.application.Application;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.HPos;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.HBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-import javafx.scene.text.TextAlignment;
 import javafx.stage.Stage;
 import model.Song;
 // Added by Gavin
@@ -45,11 +34,12 @@ import model.User;
 
 public class JukeboxStartGUI extends Application {
   
-	// BorderPane and GridPanes
+	// BorderPane, GridPanes, and HBox
 	private BorderPane all;
 	private GridPane topBar;
 	private GridPane leftSide;
 	private GridPane rightSide;
+	private HBox bottomBox;
 	// Labels 
 	private Label acct_name;
 	private Label acct_pswrd;
@@ -62,6 +52,8 @@ public class JukeboxStartGUI extends Application {
 	private Button logout_button;
 	private Button song1_button;
 	private Button song2_button;
+	// ListView for song queue
+	private ListView<String> songList;
 	// List of Users 
 	private ArrayList<User> userList;
 	// login tracker(s)
@@ -85,6 +77,7 @@ public class JukeboxStartGUI extends Application {
 		leftSide = new GridPane();
 		rightSide = new GridPane();
 		topBar = new GridPane();
+		bottomBox = new HBox();
 		currentUser = null;
 		
 		
@@ -95,7 +88,7 @@ public class JukeboxStartGUI extends Application {
 		topBar.add(song1_button, 0, 0);
 		topBar.add(song2_button, 1, 0);
 		
-		
+		// Set up Login Fields
 		acct_name = new Label("Account Name");
 		acct_pswrd = new Label("\tPassword");
 		leftSide.setVgap(12);
@@ -103,7 +96,6 @@ public class JukeboxStartGUI extends Application {
 		leftSide.add(acct_name, 1, 1);
 		leftSide.add(acct_pswrd, 1, 3);
 	
-		
 		name_input = new TextField();
 		pswrd_input = new PasswordField();
 		login_button = new Button("Login");
@@ -116,14 +108,27 @@ public class JukeboxStartGUI extends Application {
 		rightSide.add(login_response, 0, 4);
 		rightSide.add(logout_button, 0, 5);
 		
+		setupSongListView();
+		
 		all.setTop(topBar);
 		all.setLeft(leftSide);
 		all.setRight(rightSide);
+		all.setBottom(bottomBox);
 		
-		Scene scene = new Scene(all, 300, 220);
+		Scene scene = new Scene(all, 500, 500);
 		stage.setScene(scene);
 		stage.show();
 	}
+	
+	private void setupSongListView() {
+		//Set up view for queue
+		songList = new ListView<>();
+		songList.getItems().add("Song1");
+		songList.getItems().add("Song2");
+		songList.getItems().add("Song3");
+		bottomBox.getChildren().add(songList);
+	}
+	
 	// called from the start to populates the UserList 
 	private void populateUserList() {
 		userList = new ArrayList<User>();
@@ -337,14 +342,16 @@ public class JukeboxStartGUI extends Application {
 	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class SongButtonListener implements EventHandler<ActionEvent> {
-		Song song1 = new Song("LopingSting.mp3");
-		Song song2 = new Song("Capture.mp3");
-		File file1 = new File(song1.getFilePath());
-		File file2 = new File(song2.getFilePath());
-		URI uri1 = file1.toURI();
-		URI uri2 = file2.toURI();
-		Media media1 = new Media(uri1.toString());
-		Media media2 = new Media(uri2.toString());
+		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
+		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
+//		File file1 = new File(song1.getFilePath());
+//		File file2 = new File(song2.getFilePath());
+//		URI uri1 = file1.toURI();
+//		URI uri2 = file2.toURI();
+//		Media media1 = new Media(uri1.toString());
+//		Media media2 = new Media(uri2.toString());
+		Media media1 = new Media(song1.getPlayableSource());
+		Media media2 = new Media(song2.getPlayableSource());
 		MediaPlayer mediaPlayer1 = new MediaPlayer(media1);
 		MediaPlayer mediaPlayer2 = new MediaPlayer(media2);
 //		mediaPlayer1.setOnEndOfMedia(new EndOfSongHandler());
