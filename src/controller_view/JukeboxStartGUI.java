@@ -281,6 +281,8 @@ public class JukeboxStartGUI extends Application {
 		leftSide.setHgap(20);
 		leftSide.add(acct_name, 1, 1);
 		leftSide.add(acct_pswrd, 1, 3);
+		leftSide.add(name_input, 2, 1);
+		leftSide.add(pswrd_input, 2, 3);
 		all.setLeft(leftSide);
 	}
 	// clears Inputs
