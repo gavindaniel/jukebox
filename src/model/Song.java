@@ -50,6 +50,15 @@ public class Song {
 		this.numTimesPlayed = n;
 	}
 	
+	public String toMinutes() {
+		
+		int minutes = length / 60;
+		int seconds = length % 60;
+		
+		return  minutes + ":" + seconds;
+		
+	}
+	
 	//Adds one to number of song plays
 	public void incrementNumPlays() {
 		this.numTimesPlayed++;

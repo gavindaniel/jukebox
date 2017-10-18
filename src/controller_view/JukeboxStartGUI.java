@@ -129,7 +129,7 @@ public class JukeboxStartGUI extends Application {
 		songListView = new ListView<>();
 		//Add any songs previously present in user playlist to queue
 		for (Song song : currentUser.getSongQueue().getQueueOfSongs()) {
-			songListView.getItems().add(song.getTitle());
+			songListView.getItems().add(song.getTitle() + "\t\t" + song.toMinutes());
 		}
 		
 		//Set up song selection buttons
@@ -411,7 +411,7 @@ public class JukeboxStartGUI extends Application {
 			
 			if (event.getSource().toString().contains("Loping Sting")) {
 				
-				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
+				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.wav");
 				
 				//Add song to queue and play immediately if queue is empty
 				SongQueue currentQueue = currentUser.getSongQueue();
@@ -419,7 +419,7 @@ public class JukeboxStartGUI extends Application {
 				
 				if (addStatus.compareTo("Success") == 0) {
 					
-					songListView.getItems().add(song.getTitle());
+					songListView.getItems().add(song.getTitle() + "\t\t" + song.toMinutes());
 					
 					if (currentQueue.getQueueOfSongs().size() == 1) {
 						
@@ -440,7 +440,7 @@ public class JukeboxStartGUI extends Application {
 			
 			else if (event.getSource().toString().contains("Pokemon Capture")) {
 
-				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
+				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.wav");
 
 				//Add song to queue and play immediately if queue is empty
 				SongQueue currentQueue = currentUser.getSongQueue();
@@ -448,7 +448,7 @@ public class JukeboxStartGUI extends Application {
 
 				if (addStatus.compareTo("Success") == 0) {
 
-					songListView.getItems().add(song.getTitle());
+					songListView.getItems().add(song.getTitle() + "\t\t" + song.toMinutes());
 
 					if (currentQueue.getQueueOfSongs().size() == 1) {
 
