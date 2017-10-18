@@ -355,6 +355,7 @@ public class JukeboxStartGUI extends Application {
 		public void handle(ActionEvent event) {
 			String acct_name_input = name_input.getText();
 			String acct_password_input = pswrd_input.getText();
+			User current = null;
 			
 			if (acct_name_input.equals("") || acct_password_input.equals("")){
 				login_response.setText("Missing name/password.");
@@ -368,11 +369,11 @@ public class JukeboxStartGUI extends Application {
 				login_response.setText("Username (" + acct_name_input + ") taken.");
 			}
 			else {
-				currentUser = findUser(acct_name_input, acct_password_input);
+				current = findUser(acct_name_input, acct_password_input);
 			}
 			
 			
-			if (currentUser == null){ // User does not exist
+			if (current == null){ // User does not exist
 				addUser(acct_name_input, Integer.parseInt(acct_password_input));
 				login_response.setText("User (" + acct_name_input + ") added.");
 				clearInputs();
