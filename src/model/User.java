@@ -1,5 +1,11 @@
 package model;
 
+/**
+ * Stores and manages user account information and privileges.
+ * 
+ * @author Abdullah Asaad, Gavin Daniel
+ *
+ */
 public class User {
 	private String ID;
 	private int password;

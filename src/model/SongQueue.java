@@ -26,7 +26,7 @@ public class SongQueue {
 		this.mostRecentSelection = LocalDate.now();
 	}
 	
-	// Getters
+	// Getters and Setters
 	public Queue<Song> getQueueOfSongs() {
 		return this.queueOfSongs;
 	}
@@ -41,6 +41,10 @@ public class SongQueue {
 	}
 	public LocalDate getMostRecentSelection() {
 		return this.mostRecentSelection;
+	}
+	
+	public void setMostRecentSelection(LocalDate date) {
+		this.mostRecentSelection = date;
 	}
 	
 	/**
@@ -85,9 +89,16 @@ public class SongQueue {
 	 */
 	private int validateSong(Song song) {
 
+		//Check user selection date
 		if (mostRecentSelection.compareTo(LocalDate.now()) < 0) {
 			NumSongsSelected = 0;
 			mostRecentSelection = LocalDate.now();
+		}
+		
+		//Check song date
+		if (song.getMostRecentPlay().compareTo(LocalDate.now()) < 0) {
+			song.setMostRecentPlay(LocalDate.now());
+			song.setNumTimesPlayed(0);
 		}
 
 		if (NumSongsSelected >= MAX) return 1;
@@ -107,6 +118,5 @@ public class SongQueue {
 	public Song removeLastPlayedSong() {
 		return queueOfSongs.poll();
 	}
-	
-	
+
 }

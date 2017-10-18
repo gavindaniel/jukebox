@@ -2,6 +2,7 @@ package model;
 // Added to allow package model to exist on GitHub
 
 import java.io.File;
+import java.time.LocalDate;
 
 /**
  * Holds essential information about a song and provides functionality to
@@ -16,6 +17,7 @@ public class Song {
 	private int length;		//In seconds
 	private String filePath;
 	private int numTimesPlayed;
+	private LocalDate mostRecentPlay;
 	
 	public Song (String title, String artist, int length, String filePath) {
 		
@@ -24,6 +26,7 @@ public class Song {
 		this.length = length;
 		this.filePath = "songfiles/" + filePath;
 		this.numTimesPlayed = 0;
+		this.mostRecentPlay = LocalDate.now();
 	}
 	
 	// Getters and Setters
@@ -35,6 +38,7 @@ public class Song {
 		return this.artist;
 	}
 	
+	//returns Seconds
 	public int getSongLength() {
 		return this.length;
 	}
@@ -44,6 +48,13 @@ public class Song {
 	}
 	public int getNumTimesPlayed() {
 		return this.numTimesPlayed;
+	}
+	public LocalDate getMostRecentPlay() {
+		return this.mostRecentPlay;
+	}
+	
+	public void setMostRecentPlay(LocalDate date) {
+		this.mostRecentPlay = date;
 	}
 	
 	public void setNumTimesPlayed(int n) {

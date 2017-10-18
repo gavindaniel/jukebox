@@ -37,6 +37,12 @@ import model.SongQueue;
 // Added by Gavin
 import model.User;
 
+/**
+ * Provides GUI to view and control a jukebox.
+ * 
+ * @author Abdullah Asaad, Gavin Daniel
+ *
+ */
 public class JukeboxStartGUI extends Application {
   
 	// BorderPane, GridPanes, and HBox
