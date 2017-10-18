@@ -128,6 +128,12 @@ public class JukeboxStartGUI extends Application {
 		registerLoginListeners();
 	}
 	
+	// called from the start to register login listeners to the model
+	private void registerLoginListeners() {
+		login_button.setOnAction(new LoginButtonListener());
+		logout_button.setOnAction(new LogoutButtonListener());
+	}
+	
 	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
 	private void setupUserPlaylist() {
 
@@ -197,11 +203,7 @@ public class JukeboxStartGUI extends Application {
 		userList.add(new User("Merlin",7777777,true));
 	}
 	
-	// called from the start to register login listeners to the model
-	private void registerLoginListeners() {
-		login_button.setOnAction(new LoginButtonListener());
-		logout_button.setOnAction(new LogoutButtonListener());
-	}
+	
 
 	// called from the start to register song button listeners to the model
 	private void registerButtonListeners() {
@@ -299,6 +301,10 @@ public class JukeboxStartGUI extends Application {
 		name_input.clear();
 		pswrd_input.clear();
 	}
+	
+	
+/**********************   Button Listeners   *****************************/	
+	
 	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class LoginButtonListener implements EventHandler<ActionEvent> {
