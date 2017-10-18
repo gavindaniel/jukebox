@@ -419,7 +419,7 @@ public class JukeboxStartGUI extends Application {
 			
 			if (event.getSource().toString().contains("Loping Sting")) {
 				
-				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.wav");
+				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
 				
 				//Add song to queue and play immediately if queue is empty
 				SongQueue currentQueue = currentUser.getSongQueue();
@@ -448,7 +448,7 @@ public class JukeboxStartGUI extends Application {
 			
 			else if (event.getSource().toString().contains("Pokemon Capture")) {
 
-				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.wav");
+				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
 
 				//Add song to queue and play immediately if queue is empty
 				SongQueue currentQueue = currentUser.getSongQueue();
