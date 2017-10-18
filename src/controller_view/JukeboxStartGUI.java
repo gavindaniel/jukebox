@@ -290,7 +290,7 @@ public class JukeboxStartGUI extends Application {
 		name_input.clear();
 		pswrd_input.clear();
 	}
-	
+	// hi
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class LoginButtonListener implements EventHandler<ActionEvent> {
 		@Override
