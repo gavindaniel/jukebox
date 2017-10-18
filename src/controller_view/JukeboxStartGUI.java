@@ -63,6 +63,7 @@ public class JukeboxStartGUI extends Application {
 	private ArrayList<User> userList;
 	// login tracker(s)
 	private User currentUser;
+	private User previousUser;
 	private int num_login_attempts;
 	
 	public static void main(String[] args) {
@@ -83,6 +84,7 @@ public class JukeboxStartGUI extends Application {
 		buttonBox = new VBox();
 		bottomBox = new HBox();
 		currentUser = null;
+		previousUser = null;
 		
 		setupLoginView();
 		
@@ -125,6 +127,10 @@ public class JukeboxStartGUI extends Application {
 
 		//Set up ListView for song queue
 		songListView = new ListView<>();
+		//Add any songs previously present in user playlist to queue
+		for (Song song : currentUser.getSongQueue().getQueueOfSongs()) {
+			songListView.getItems().add(song.getTitle());
+		}
 		
 		//Set up song selection buttons
 		song1_button = new Button("Loping Sting");
@@ -150,7 +156,22 @@ public class JukeboxStartGUI extends Application {
 		
 		//Add Box to bottom of borderPane
 		all.setBottom(bottomBox);
+		
+		//Play any existing songs from old playlist
+		startPlaylist();
 
+	}
+	
+	private void startPlaylist() {
+		
+		Song nextSong = currentUser.getSongQueue().serveNextSong();
+		
+		if (nextSong != null) {
+    		SongPlayer songPlayer = new SongPlayer(nextSong);
+			songPlayer.playSong();
+			songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+    	}
+		
 	}
 	
 	private void removeUserPlaylist() {
@@ -310,6 +331,7 @@ public class JukeboxStartGUI extends Application {
 				if (currentUser.getAdminAccess()) {
 					removeAdminButtons();
 				}
+				previousUser = currentUser;
 				currentUser = null;
 				removeUserPlaylist();
 			}
@@ -452,9 +474,17 @@ public class JukeboxStartGUI extends Application {
 	    @Override
 	    public void run() {
 	    	System.out.println("Song ended");
-	    	currentUser.getSongQueue().removeLastPlayedSong();
-	    	songListView.getItems().remove(0);
-	    	playNextSong();
+	    	
+	    	//If-Else Handles case where user logs out during song playback
+	    	if (currentUser != null) {
+	    		currentUser.getSongQueue().removeLastPlayedSong();
+	    		songListView.getItems().remove(0);
+	    		playNextSong();
+	    	}
+	    	
+	    	else {
+	    		previousUser.getSongQueue().removeLastPlayedSong();
+	    	}
 	    }
 	    
 	    private void playNextSong() {
