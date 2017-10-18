@@ -6,6 +6,7 @@
 
 # Song files
 *.mp3
+*.wav
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
