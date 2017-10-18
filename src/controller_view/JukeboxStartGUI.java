@@ -243,9 +243,18 @@ public class JukeboxStartGUI extends Application {
 	}
 	
 	// function to check if Username is already taken
-	private void addUser(String username, int password) {
-		User newUser = new User(username,password,false);
-		userList.add(newUser);
+	private void addUser(String username, String password) {
+		try {
+			int pswrd = Integer.parseInt(password);
+			User newUser = new User(username,pswrd,false);
+			userList.add(newUser);
+			login_response.setText("User (" + username + ") added.");
+		}
+		catch (Exception e){
+			System.out.println("*** EXCEPTION THROWN: " + e.getMessage());
+			login_response.setText("Enter a valid password");
+		}
+		
 	}
 		
 	// function to check if Username is already taken
@@ -374,8 +383,7 @@ public class JukeboxStartGUI extends Application {
 			
 			
 			if (current == null){ // User does not exist
-				addUser(acct_name_input, Integer.parseInt(acct_password_input));
-				login_response.setText("User (" + acct_name_input + ") added.");
+				addUser(acct_name_input, acct_password_input);
 				clearInputs();
 			}
 			else {
