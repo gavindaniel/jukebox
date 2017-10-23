@@ -19,7 +19,7 @@ public class SongTest {
 	@Test
 	public void testNumberofSongsPerUser() {
 
-		SongQueue queue = new SongQueue();
+		SongQueue queue = new SongQueue(false);
 
 		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
 		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
@@ -46,7 +46,7 @@ public class SongTest {
 	@Test
 	public void testNumberofPlaysPerSong() {
 
-		SongQueue queue = new SongQueue();
+		SongQueue queue = new SongQueue(false);
 
 		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
 
@@ -79,7 +79,7 @@ public class SongTest {
 	@Test
 	public void testTimeRemaining() {
 
-		SongQueue queue = new SongQueue();
+		SongQueue queue = new SongQueue(false);
 
 		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
 		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");

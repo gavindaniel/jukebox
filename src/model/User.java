@@ -19,7 +19,7 @@ public class User {
 		this.password = -9999;
 		this.admin_access = false;
 		this.num_logins = 0;
-		mySongQueue = new SongQueue();
+		this.mySongQueue = new SongQueue(false);
 	}
 	// pre-defined constructor
 	public User(String id, int pswrd, boolean admin){
@@ -27,7 +27,7 @@ public class User {
 		this.password = pswrd;
 		this.admin_access = admin;
 		this.num_logins = 0;
-		mySongQueue = new SongQueue();
+		this.mySongQueue = new SongQueue(admin);
 	}
 	
 	public String getID() {
