@@ -21,8 +21,8 @@ public class SongTest {
 
 		SongQueue queue = new SongQueue();
 
-		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.wav");
-		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.wav");
+		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
+		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
 
 		queue.addSong(song1);
 		queue.addSong(song2);
@@ -48,7 +48,7 @@ public class SongTest {
 
 		SongQueue queue = new SongQueue();
 
-		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.wav");
+		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
 
 		queue.addSong(song1);
 		queue.addSong(song1);
@@ -81,8 +81,8 @@ public class SongTest {
 
 		SongQueue queue = new SongQueue();
 
-		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.wav");
-		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.wav");
+		Song song1 = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
+		Song song2 = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
 
 		queue.addSong(song1);
 		queue.addSong(song2);
