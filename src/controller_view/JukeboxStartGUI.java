@@ -24,10 +24,14 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
@@ -65,6 +69,8 @@ public class JukeboxStartGUI extends Application {
 	private Button song2_button;
 	// ListView for song queue
 	private ListView<String> songListView;
+	//TableView for all available songs
+	private SongViewer songViewer = new SongViewer();
 	// List of Users 
 	private ArrayList<User> userList;
 	// login tracker(s)
@@ -94,7 +100,7 @@ public class JukeboxStartGUI extends Application {
 		
 		setupLoginView();
 		
-		Scene scene = new Scene(all, 600, 500);
+		Scene scene = new Scene(all, 710, 500);
 		stage.setScene(scene);
 		stage.show();
 	}
@@ -162,8 +168,9 @@ public class JukeboxStartGUI extends Application {
 		
 		//Add list and button to bottomBox
 		bottomBox.getChildren().add(songListView);
-		bottomBox.getChildren().add(buttonBox);
-		bottomBox.setSpacing(30);
+//		bottomBox.getChildren().add(buttonBox);
+		bottomBox.getChildren().add(songViewer);
+		bottomBox.setSpacing(120);
 		bottomBox.setPadding(new Insets(40,0,0,0));
 		
 		//Add Box to bottom of borderPane
@@ -541,6 +548,31 @@ public class JukeboxStartGUI extends Application {
 		
 		public void playSong() {
 			SongPlayer.mediaPlayer.play();
+		}
+	}
+	
+	private class SongViewer extends TableView<Song> {
+		
+		@SuppressWarnings("unchecked")
+		public SongViewer() {
+			
+			TableColumn<Song, Integer> numPlayedCol = new TableColumn<>("Plays");
+			TableColumn<Song, String> titleCol = new TableColumn<>("Title");
+			TableColumn<Song, String> artistCol = new TableColumn<>("Artist");
+			TableColumn<Song, String> timeCol = new TableColumn<>("Time");
+			
+			numPlayedCol.setCellValueFactory(new PropertyValueFactory<Song, Integer>("numTimesPlayed"));
+			titleCol.setCellValueFactory(new PropertyValueFactory<Song, String>("title"));
+			artistCol.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
+			timeCol.setCellValueFactory(new PropertyValueFactory<Song, String>("length"));
+			
+			this.getColumns().addAll(numPlayedCol, titleCol, artistCol, timeCol);
+			
+			numPlayedCol.setPrefWidth(50);
+			titleCol.setPrefWidth(120);
+			artistCol.setPrefWidth(120);
+			timeCol.setPrefWidth(50);
+			this.setMaxWidth(342);
 		}
 	}
 	
