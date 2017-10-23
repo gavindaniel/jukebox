@@ -36,6 +36,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import model.Song;
+import model.SongLibrary;
 import model.SongPlayer;
 import model.SongQueue;
 // Added by Gavin
@@ -66,8 +67,10 @@ public class JukeboxStartGUI extends Application {
 	private Button login_button;
 	private Button logout_button;
 	private Button addSong_button;
+	// Song Library
+	private static SongLibrary song_library = new SongLibrary();
 	// ListView for song queue
-	private TableView<Song> song_library;
+//	private TableView<Song> song_library;
 	private ListView<String> song_queue;
 	private ObservableList<Song> songs_in_library;
 	private ObservableList<String> songs_in_queue;
@@ -155,45 +158,22 @@ public class JukeboxStartGUI extends Application {
 	}
 	
 	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
-	@SuppressWarnings("unchecked")
 	private void setupUserQueue() {
 
 		//Set up ListView for song queue
 		songs_in_queue = FXCollections.observableArrayList();
 		song_queue = new ListView<String>();
-		song_library = new TableView<Song>();
 		//Add any songs previously present in user playlist to queue
 		for (Song song : currentUser.getSongQueue().getQueueOfSongs()) {
 			songs_in_queue.add( song.getTitle() + "\t" + song.toMinutes( song.getSongLength() ) );
 		}
-		
 		song_queue.setItems(songs_in_queue);
 		
-		song_library.setEditable(false);
-		// create table columns
-		TableColumn <Song, Integer> playsColumn = new TableColumn<>("Plays");
-			playsColumn.setMaxWidth(50);
-			playsColumn.setMinWidth(50);
-			playsColumn.setCellValueFactory(new PropertyValueFactory<Song, Integer>("numTimesPlayed"));
-		TableColumn <Song, String> titleColumn = new TableColumn<>("Title");
-			titleColumn.setMaxWidth(150);
-			titleColumn.setMinWidth(150);
-			titleColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("title"));
-		TableColumn <Song, String> artistColumn = new TableColumn<>("Artist");
-			artistColumn.setMaxWidth(150);
-			artistColumn.setMinWidth(150);
-			artistColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
-		TableColumn <Song, String> timeColumn = new TableColumn<>("Time");
-			timeColumn.setMaxWidth(60);
-			timeColumn.setMinWidth(60);
-			timeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("length"));
-		// add columns to table
-		song_library.getColumns().addAll(playsColumn,titleColumn,artistColumn,timeColumn);
-		// initialize SongList
+		// initialize Song Library
 		populateSongLibrary();
 		
 		//Set up song selection buttons
-		addSong_button = new Button("<<");
+		addSong_button = new Button("<");
 		buttonBox.getChildren().add(addSong_button);
 		buttonBox.setSpacing(15);
 		
@@ -329,12 +309,12 @@ public class JukeboxStartGUI extends Application {
 	
 	// function to add the Add/Drop buttons for when an admin logs-in.
 	private void addAdminButtons() {
-		Button addButton = new Button("Add");
+		Button addButton = new Button("   Add User   ");
 		addButton.setOnAction(new AddButtonListener());
-		Button removeButton = new Button("Remove");
+		Button removeButton = new Button("Remove User");
 		removeButton.setOnAction(new RemoveButtonListener());
-		leftSide.add(addButton, 1, 5);
-		leftSide.add(removeButton, 1, 6);
+		leftSide.add(addButton, 3, 1);
+		leftSide.add(removeButton, 3, 3);
 	}
 	
 	// function to remove the Add/Drop buttons for when an admin logs-out.
