@@ -66,8 +66,6 @@ public class JukeboxStartGUI extends Application {
 	// Buttons for the Login Screen
 	private Button login_button;
 	private Button logout_button;
-	private Button song1_button;
-	private Button song2_button;
 	private Button addSong_button;
 	// ListView for song queue
 	private TableView songList;
@@ -152,6 +150,8 @@ public class JukeboxStartGUI extends Application {
 				new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.mp3"),
 				new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.mp3"),
 				new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.mp3"));
+			
+			songList.setItems(songs);
 	}
 	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
 	private void setupUserPlaylist() {
@@ -173,15 +173,18 @@ public class JukeboxStartGUI extends Application {
 		TableColumn titleColumn = new TableColumn("Title");
 			titleColumn.setMaxWidth(150);
 			titleColumn.setMinWidth(150);
+			titleColumn.setCellValueFactory(new PropertyValueFactory<Song, Integer>("title"));
 		TableColumn artistColumn = new TableColumn("Artist");
 			artistColumn.setMaxWidth(150);
 			artistColumn.setMaxWidth(150);
+			artistColumn.setCellValueFactory(new PropertyValueFactory<Song, Integer>("artist"));
 		TableColumn timeColumn = new TableColumn("Time");
 			timeColumn.setMaxWidth(50);
-			playsColumn.setMinWidth(50);
+			timeColumn.setMinWidth(50);
+			timeColumn.setCellValueFactory(new PropertyValueFactory<Song, Integer>("length"));
 		// add columns to table
 		songList.getColumns().addAll(playsColumn,titleColumn,artistColumn,timeColumn);
-		// Add list of songs to the song List
+		// initialize SongList
 		createSongList();
 		
 		//Set up song selection buttons
@@ -252,6 +255,7 @@ public class JukeboxStartGUI extends Application {
 	private void registerButtonListeners() {
 //		song1_button.setOnAction(new SongButtonListener());
 //		song2_button.setOnAction(new SongButtonListener());
+		addSong_button.setOnAction(new SongButtonListener());
 	}
 	
 	
@@ -475,11 +479,10 @@ public class JukeboxStartGUI extends Application {
 		@Override
 		public void handle(ActionEvent event) {
 			
-			if (event.getSource().toString().contains("Loping Sting")) {
+			try {
+				song = (Song) songList.getSelectionModel().getSelectedItem();
+				System.out.println(song.getTitle());
 				
-				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
-				
-				//Add song to queue and play immediately if queue is empty
 				SongQueue currentQueue = currentUser.getSongQueue();
 				String addStatus = currentQueue.addSong(song);
 				
@@ -501,40 +504,14 @@ public class JukeboxStartGUI extends Application {
 					alert.setHeaderText(addStatus);
 					alert.showAndWait();
 				}
-				
 			}
 			
-			else if (event.getSource().toString().contains("Pokemon Capture")) {
-
-				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
-
-				//Add song to queue and play immediately if queue is empty
-				SongQueue currentQueue = currentUser.getSongQueue();
-				String addStatus = currentQueue.addSong(song);
-
-				if (addStatus.compareTo("Success") == 0) {
-
-					queueView.getItems().add(song.getTitle() + "\t\t" + song.toMinutes());
-
-					if (currentQueue.getQueueOfSongs().size() == 1) {
-
-						SongPlayer songPlayer = new SongPlayer(song);
-						songPlayer.playSong();
-						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-					}
-
-				}
-
-				else {
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("Not Allowed");
-					alert.setHeaderText(addStatus);
-					alert.showAndWait();
-				}
-			}
-			
+			catch (NullPointerException e){
+				System.out.print("NullPointerException caught");
+			}	
 		}
 	}
+	
 	
 	private class EndOfSongHandler implements Runnable {
 	    @Override
