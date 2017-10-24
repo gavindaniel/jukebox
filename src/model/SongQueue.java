@@ -16,14 +16,19 @@ public class SongQueue {
 	private int NumSongsSelected;
 	private int timeRemaining;	//Seconds
 	private LocalDate mostRecentSelection;
-	public final static int MAX = 3;
+	public int MAX;
 
 	//Constructor instantiates an LinkedList object implementing the Queue
-	public SongQueue() {
+	public SongQueue(boolean unlimited) {
 		this.queueOfSongs = new LinkedList<>();
 		this.NumSongsSelected = 0;
 		this.timeRemaining = 1500*60;
 		this.mostRecentSelection = LocalDate.now();
+		
+		if (unlimited)
+			MAX = 9999;
+		else 
+			MAX = 3;
 	}
 	
 	// Getters and Setters
@@ -63,7 +68,7 @@ public class SongQueue {
 			queueOfSongs.add(song);
 			NumSongsSelected++;
 			timeRemaining -= song.getSongLength();
-			song.incrementNumPlays();
+//			song.incrementNumPlays();
 			
 			return "Success";
 		}
@@ -100,7 +105,7 @@ public class SongQueue {
 			song.setMostRecentPlay(LocalDate.now());
 			song.setNumTimesPlayed(0);
 		}
-
+		
 		if (NumSongsSelected >= MAX) return 1;
 
 		if (song.getNumTimesPlayed() >= MAX) return 2;

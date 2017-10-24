@@ -1,22 +1,12 @@
 package controller_view;
 
-
-import java.util.ArrayList;
-
-/**
- * This program is a functional spike to determine the interactions are 
- * actually working. It is an event-driven program with a graphical user
- * interface to affirm the functionality all Iteration 1 tasks have been 
- * completed and are working correctly. This program will be used to 
- * test your code for the first 100 points of the JukeBox project.
- */
-
 // Given by Rick
 import javafx.application.Application;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -33,13 +23,8 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.VBox;
-import javafx.scene.media.Media;
-import javafx.scene.media.MediaPlayer;
 import javafx.stage.Stage;
-import model.Song;
-import model.SongQueue;
-// Added by Gavin
-import model.User;
+import model.*;
 
 /**
  * Provides GUI to view and control a jukebox.
@@ -65,14 +50,14 @@ public class JukeboxStartGUI extends Application {
 	// Buttons for the Login Screen
 	private Button login_button;
 	private Button logout_button;
-	private Button song1_button;
-	private Button song2_button;
-	// ListView for song queue
-	private ListView<String> songListView;
-	//TableView for all available songs
-	private SongViewer songViewer = new SongViewer();
-	// List of Users 
-	private ArrayList<User> userList;
+	private Button addSong_button;
+	// Song Library & Song Queue
+	private static SongLibrary song_library = new SongLibrary();
+	// ObservableLists
+	private ListView<String> song_queue;
+	private ObservableList<Song> songs_in_library;
+	private ObservableList<String> songs_in_queue;
+	private UserCollection users;
 	// login tracker(s)
 	private User currentUser;
 	private User previousUser;
@@ -84,7 +69,7 @@ public class JukeboxStartGUI extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		populateUserList();
+		users = new UserCollection();
 		layoutGUI_setupModel(primaryStage);
 	}
 	  
@@ -100,7 +85,7 @@ public class JukeboxStartGUI extends Application {
 		
 		setupLoginView();
 		
-		Scene scene = new Scene(all, 710, 500);
+		Scene scene = new Scene(all, 700, 500);
 		stage.setScene(scene);
 		stage.show();
 	}
@@ -140,155 +125,90 @@ public class JukeboxStartGUI extends Application {
 		logout_button.setOnAction(new LogoutButtonListener());
 	}
 	
+	// constructs song List
+	private void populateSongLibrary() {
+			songs_in_library = FXCollections.observableArrayList(
+				new Song("Pokemon Capture","Pikachu",5,"Capture.mp3"),
+				new Song("Danse Macabre","Kevin MacLeod",34,"DanseMacabreViolinHook.mp3"),
+				new Song("Determined Tumbao","FreePlay Music",20,"DeterminedTumbao.mp3"),
+				new Song("Loping Sting","Kevin MacLeod",5,"LopingSting.mp3"),
+				new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.mp3"),
+				new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.mp3"),
+				new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.mp3"));
+			
+			song_library.setItems(songs_in_library);
+	}
+	
 	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
-	private void setupUserPlaylist() {
+	private void setupUserQueue() {
 
 		//Set up ListView for song queue
-		songListView = new ListView<>();
+		songs_in_queue = FXCollections.observableArrayList();
+		song_queue = new ListView<String>();
 		//Add any songs previously present in user playlist to queue
 		for (Song song : currentUser.getSongQueue().getQueueOfSongs()) {
-			songListView.getItems().add(song.getTitle() + "\t\t" + song.toMinutes());
+			songs_in_queue.add( song.getTitle());
 		}
+		song_queue.setItems(songs_in_queue);
+		
+		// initialize Song Library
+		populateSongLibrary();
 		
 		//Set up song selection buttons
-		song1_button = new Button("Loping Sting");
-		song2_button = new Button("Pokemon Capture");
-		buttonBox.getChildren().add(song1_button);
-		buttonBox.getChildren().add(song2_button);
+		addSong_button = new Button("<");
+		buttonBox.getChildren().add(addSong_button);
 		buttonBox.setSpacing(15);
 		
-		//Setting width of buttons to be equal
-		for (Node node : buttonBox.getChildren()) {
-			Button button = (Button) node;
-			button.setMaxWidth(500);
-		}
-		
 		//Register handlers for buttons
-		registerButtonListeners();
+		addSong_button.setOnAction(new SongButtonListener());
 		
 		//Add list and button to bottomBox
-		bottomBox.getChildren().add(songListView);
-//		bottomBox.getChildren().add(buttonBox);
-		bottomBox.getChildren().add(songViewer);
-		bottomBox.setSpacing(120);
+
+		bottomBox.getChildren().add(song_queue);
+		bottomBox.getChildren().add(buttonBox);
+		bottomBox.getChildren().add(song_library);
+		bottomBox.setSpacing(30);
 		bottomBox.setPadding(new Insets(40,0,0,0));
 		
 		//Add Box to bottom of borderPane
 		all.setBottom(bottomBox);
 		
 		//Play any existing songs from old playlist
-		startPlaylist();
-
+		startQueue();
 	}
 	
-	private void startPlaylist() {
+	private void startQueue() {
 		
 		Song nextSong = currentUser.getSongQueue().serveNextSong();
 		
 		if (nextSong != null) {
-    		SongPlayer songPlayer = new SongPlayer(nextSong);
-			songPlayer.playSong();
-			songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-    	}
-		
+    			SongPlayer songPlayer = new SongPlayer(nextSong);
+    				songPlayer.playSong();
+    				songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+    		}	
 	}
 	
-	private void removeUserPlaylist() {
-		
+	private void removeUserQueue() {
 		all.setBottom(null);
 		bottomBox.getChildren().clear();
 		buttonBox.getChildren().clear();
 	}
-		
-	//Called from the start to populates the UserList 
-	private void populateUserList() {
-		userList = new ArrayList<User>();
-		userList.add(new User("Chris",1,false));
-		userList.add(new User("Devon",22,false));
-		userList.add(new User("River",333,false));
-		userList.add(new User("Ryan",4444,false));
-		userList.add(new User("Merlin",7777777,true));
+	
+	private void newAlertMessage(String allowed, String message) {
+		Alert alert = new Alert(AlertType.INFORMATION);
+		alert.setTitle(allowed);
+		alert.setHeaderText(message);
+		alert.showAndWait();
 	}
 	
-	
-
-	// called from the start to register song button listeners to the model
-	private void registerButtonListeners() {
-		song1_button.setOnAction(new SongButtonListener());
-		song2_button.setOnAction(new SongButtonListener());
-	}
-	
-	
-	
-	// function used in LoginButtonListener to verify the user exists in the UserList
-	private User findUser(String username, String password) {
-		  
-		try {
-			int pswrd = Integer.parseInt(password);
-			for (int i = 0; i < userList.size(); i++){
-				if ((userList.get(i).getID().equals(username)) && (userList.get(i).getPassword() == pswrd))
-				{
-					userList.get(i).setNumLogins(userList.get(i).getNumLogins()+1);
-					return userList.get(i); 
-				}
-			}
-		}
-		catch (Exception e){
-			System.out.println("*** EXCEPTION THROWN: " + e.getMessage());
-		}
-		
-		return null;
-	}
-	
-	// function to check if Username is already taken
-	private boolean checkUsernameTaken(String username) {
-		for (int i = 0; i < userList.size(); i++){
-			if ((userList.get(i).getID().equals(username)))
-			{
-				return true;
-			}
-		}
-		return false;
-	}
-	
-	// function to check if Username is already taken
-	private void addUser(String username, String password) {
-		try {
-			int pswrd = Integer.parseInt(password);
-			User newUser = new User(username,pswrd,false);
-			userList.add(newUser);
-			login_response.setText("User (" + username + ") added.");
-		}
-		catch (Exception e){
-			System.out.println("*** EXCEPTION THROWN: " + e.getMessage());
-			login_response.setText("Enter a valid password");
-		}
-		
-	}
-		
-	// function to check if Username is already taken
-	private void removeUser(String username) {
-		for (int i = 0; i < userList.size(); i++){
-			if ((userList.get(i).getID().equals(username)))
-			{
-				if (userList.get(i).getAdminAccess() == false) {
-					userList.remove(i);
-					login_response.setText("User (" + username + ") removed.");
-				}
-				else 
-					login_response.setText("Cannot remove admin (" + username + ")");
-			}
-		}
-	}
-		
 	// function to add the Add/Drop buttons for when an admin logs-in.
 	private void addAdminButtons() {
-		Button addButton = new Button("Add");
+		Button addButton = new Button("   Add User   ");
 		addButton.setOnAction(new AddButtonListener());
-		Button removeButton = new Button("Remove");
+		Button removeButton = new Button("Remove User");
 		removeButton.setOnAction(new RemoveButtonListener());
-		leftSide.add(addButton, 1, 5);
-		leftSide.add(removeButton, 1, 6);
+		leftSide.add(addButton, 3, 1);
+		leftSide.add(removeButton, 3, 3);
 	}
 	
 	// function to remove the Add/Drop buttons for when an admin logs-out.
@@ -317,37 +237,34 @@ public class JukeboxStartGUI extends Application {
 	private class LoginButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			String acct_name_input = name_input.getText();
-			String acct_password_input = pswrd_input.getText();
+			String username_input = name_input.getText();
+			String password_input = pswrd_input.getText();
 			// check if the user filled in both input fields
-			if (acct_name_input.equals("") || acct_password_input.equals("")){
-				login_response.setText("Missing name/password.");
-				System.out.println(acct_name_input);
-				System.out.println(acct_password_input);
-				return; // EXIT : ERROR
+			if (username_input.equals("") || password_input.equals("")){
+				newAlertMessage("Failed", "Missing username/password.");
+				return;
 			}
 			// check if someone is already logged in before trying to log-in
 			if (currentUser == null) {
-				currentUser = findUser(acct_name_input, acct_password_input);
-				if (currentUser != null) setupUserPlaylist();
+				currentUser = users.findUser(username_input, password_input);
+				if (currentUser != null) 
+					setupUserQueue();
 			}
 			else {
-				login_response.setText("logout first -> (" + currentUser.getID() + ")");
+				newAlertMessage("Failed", "logout first -> (" + currentUser.getID() + ")");
 				return;
 			}
 			// if no one is logged in, check if the user attempting to login actually exists
 			if (currentUser != null){
-				login_response.setText("Hello! " + acct_name_input);
+				login_response.setText("Hello! " + username_input);
 				num_login_attempts = 0;
 				clearInputs();
-				System.out.println("***** Num. times logged in:  " + currentUser.getNumLogins() + "  *****");
-				if (currentUser.getAdminAccess()) {
+				if (currentUser.getAdminAccess())
 					addAdminButtons();
-				}
 			}
 			else {
 				num_login_attempts++;
-				login_response.setText("Incorrect. " + (3-num_login_attempts) + " attempt(s) left");
+				newAlertMessage("Failed", "Incorrect. " + (3-num_login_attempts) + " attempt(s) left");
 			}	
 		}
 	}
@@ -358,16 +275,16 @@ public class JukeboxStartGUI extends Application {
 			
 			if (currentUser != null){
 				login_response.setText("Good-bye! " + currentUser.getID());
-				if (currentUser.getAdminAccess()) {
+				if (currentUser.getAdminAccess()) 
 					removeAdminButtons();
-				}
+				
 				previousUser = currentUser;
 				currentUser = null;
-				removeUserPlaylist();
+				removeUserQueue();
 			}
-			else {
-				login_response.setText("Please login first.");
-			}
+			else 
+				newAlertMessage("Failed","Please login first.");
+			
 		}
 	}
 	
@@ -375,32 +292,23 @@ public class JukeboxStartGUI extends Application {
 	private class AddButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			String acct_name_input = name_input.getText();
-			String acct_password_input = pswrd_input.getText();
+			String username_input = name_input.getText();
+			String password_input = pswrd_input.getText();
 			User current = null;
 			
-			if (acct_name_input.equals("") || acct_password_input.equals("")){
-				login_response.setText("Missing name/password.");
-				System.out.println(acct_name_input);
-				System.out.println(acct_password_input);
-				return; // EXIT : ERROR
+			if (username_input.equals("") || password_input.equals("")){
+				newAlertMessage("Failed", "Missing username/password.");
+				return; 
+			}
+			if ( users.checkUsernameTaken(username_input) ) {
+				newAlertMessage("Failed", "Username (" + username_input + ") already taken.");
+				return;
 			}
 			
-			boolean userTaken = checkUsernameTaken(acct_name_input);
-			if (userTaken) {
-				login_response.setText("Username (" + acct_name_input + ") taken.");
-			}
-			else {
-				current = findUser(acct_name_input, acct_password_input);
-			}
-			
-			
+			current = users.findUser(username_input, password_input);
 			if (current == null){ // User does not exist
-				addUser(acct_name_input, acct_password_input);
-				clearInputs();
-			}
-			else {
-				login_response.setText("User (" + currentUser.getID() + ") exists");
+				users.add(username_input, password_input);
+				newAlertMessage("Success", "User (" + username_input + ") successfully added.");
 				clearInputs();
 			}
 		}
@@ -410,24 +318,19 @@ public class JukeboxStartGUI extends Application {
 	private class RemoveButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			String acct_name_input = name_input.getText();
+			String username_input = name_input.getText();
 			
-			if (acct_name_input.equals("")){
-				login_response.setText("Missing username.");
-				System.out.println(acct_name_input);
-				return; // EXIT : ERROR
+			if (username_input.equals("")){
+				newAlertMessage("Failed", "Missing username.");
+				return; 
 			}
 			
-			boolean userExists = checkUsernameTaken(acct_name_input);
-			
-			if (userExists) {
-				removeUser(acct_name_input);
-				clearInputs();
-			}
-			else {
-				login_response.setText("User (" + acct_name_input + ") DNE.");
-				clearInputs();
-			}
+			if ( users.checkUsernameTaken(username_input) )
+				users.remove(username_input);
+			else
+				newAlertMessage("Failed", "User (" + username_input + ") Does Not Exist!");
+
+			clearInputs();
 		}
 	}
 	
@@ -439,20 +342,17 @@ public class JukeboxStartGUI extends Application {
 		@Override
 		public void handle(ActionEvent event) {
 			
-			if (event.getSource().toString().contains("Loping Sting")) {
+			try {
+				song = song_library.getSelectionModel().getSelectedItem();
 				
-				song = new Song("Loping Sting", "Kevin MacLeod", 5, "LopingSting.mp3");
-				
-				//Add song to queue and play immediately if queue is empty
 				SongQueue currentQueue = currentUser.getSongQueue();
 				String addStatus = currentQueue.addSong(song);
 				
 				if (addStatus.compareTo("Success") == 0) {
-					
-					songListView.getItems().add(song.getTitle() + "\t\t" + song.toMinutes());
-					
+
+					songs_in_queue.add(song.getTitle());
+
 					if (currentQueue.getQueueOfSongs().size() == 1) {
-						
 						SongPlayer songPlayer = new SongPlayer(song);
 						songPlayer.playSong();
 						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
@@ -460,95 +360,49 @@ public class JukeboxStartGUI extends Application {
 				}
 				
 				else {
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("Not Allowed");
-					alert.setHeaderText(addStatus);
-					alert.showAndWait();
+					newAlertMessage("Failed", addStatus);
 				}
-				
+				song_queue.refresh();
 			}
 			
-			else if (event.getSource().toString().contains("Pokemon Capture")) {
-
-				song = new Song("Pokemon Capture", "Pikachu", 5, "Capture.mp3");
-
-				//Add song to queue and play immediately if queue is empty
-				SongQueue currentQueue = currentUser.getSongQueue();
-				String addStatus = currentQueue.addSong(song);
-
-				if (addStatus.compareTo("Success") == 0) {
-
-					songListView.getItems().add(song.getTitle() + "\t\t" + song.toMinutes());
-
-					if (currentQueue.getQueueOfSongs().size() == 1) {
-
-						SongPlayer songPlayer = new SongPlayer(song);
-						songPlayer.playSong();
-						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-					}
-
-				}
-
-				else {
-					Alert alert = new Alert(AlertType.INFORMATION);
-					alert.setTitle("Not Allowed");
-					alert.setHeaderText(addStatus);
-					alert.showAndWait();
-				}
-			}
-			
+			catch (NullPointerException e){
+				System.out.println("NullPointerException caught");
+				newAlertMessage("Failed", "Select a Song first");
+			}	
 		}
 	}
+	
 	
 	private class EndOfSongHandler implements Runnable {
 	    @Override
 	    public void run() {
-	    	System.out.println("Song ended");
-	    	
-	    	//If-Else Handles case where user logs out during song playback
-	    	if (currentUser != null) {
-	    		currentUser.getSongQueue().removeLastPlayedSong();
-	    		songListView.getItems().remove(0);
-	    		playNextSong();
-	    	}
-	    	
-	    	else {
-	    		previousUser.getSongQueue().removeLastPlayedSong();
-	    	}
+		    	
+		    	//If-Else Handles case where user logs out during song playback
+		    	if (currentUser != null) {
+		    		Song s = currentUser.getSongQueue().removeLastPlayedSong();
+		    		s.incrementNumPlays();
+		    		songs_in_queue.remove(0);
+		    		playNextSong();
+		    	}
+		    	
+		    	else {
+		    		previousUser.getSongQueue().removeLastPlayedSong();
+		    	}
+		    	
+		    	song_library.refresh();
+		    	song_queue.refresh();
 	    }
 	    
 	    private void playNextSong() {
-	    	
-	    	Song nextSong = currentUser.getSongQueue().serveNextSong();
-	    	
-	    	if (nextSong != null) {
-	    		SongPlayer songPlayer = new SongPlayer(nextSong);
-				songPlayer.playSong();
-				songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-	    	}
+		    	Song nextSong = currentUser.getSongQueue().serveNextSong();
+		    	
+		    	if (nextSong != null) {
+		    		SongPlayer songPlayer = new SongPlayer(nextSong);
+					songPlayer.playSong();
+					songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+		    	}
 	    	
 	    }
-	  }
-	
-	private static class SongPlayer {
-		
-		private Song song;
-		private Media songMedia;
-		private static MediaPlayer mediaPlayer;
-		
-		public SongPlayer(Song song) {			
-			this.song = song;
-			this.songMedia = new Media(this.song.getPlayableSource());
-			SongPlayer.mediaPlayer = new MediaPlayer(songMedia);
-		}
-		
-		public MediaPlayer getMediaPlayer() {
-			return SongPlayer.mediaPlayer;
-		}
-		
-		public void playSong() {
-			SongPlayer.mediaPlayer.play();
-		}
 	}
 	
 	private class SongViewer extends TableView<Song> {
@@ -575,6 +429,8 @@ public class JukeboxStartGUI extends Application {
 			this.setMaxWidth(342);
 		}
 	}
+	
+	
 	
 	
 	

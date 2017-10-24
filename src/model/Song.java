@@ -4,6 +4,7 @@ package model;
 import java.io.File;
 import java.time.LocalDate;
 
+
 /**
  * Holds essential information about a song and provides functionality to
  * manage number of song plays.
@@ -14,16 +15,18 @@ public class Song {
 	
 	private String title;
 	private String artist;
-	private int length;		//In seconds
+	private int length_s;		//In seconds
+	private String length;			// String version
 	private String filePath;
 	private int numTimesPlayed;
 	private LocalDate mostRecentPlay;
 	
-	public Song (String title, String artist, int length, String filePath) {
+	public Song (String title, String artist, int length_s, String filePath) {
 		
 		this.title = title;
 		this.artist = artist;
-		this.length = length;
+		this.length_s = length_s;
+		this.length = toMinutes(length_s);
 		this.filePath = "songfiles/" + filePath;
 		this.numTimesPlayed = 0;
 		this.mostRecentPlay = LocalDate.now();
@@ -40,7 +43,7 @@ public class Song {
 	
 	//returns Seconds
 	public int getSongLength() {
-		return this.length;
+		return this.length_s;
 	}
 	
 	public String getFilePath() {
@@ -61,13 +64,20 @@ public class Song {
 		this.numTimesPlayed = n;
 	}
 	
-	public String toMinutes() {
+	public String toMinutes(int s) {
 		
-		int minutes = length / 60;
-		int seconds = length % 60;
+		int minutes = (s / 60);
+		int seconds = s % 60;
+		String min = "" + minutes;
+		String sec = "" + seconds;
 		
-		return  minutes + ":" + seconds;
+		if (minutes < 10)
+			min = "0" + minutes;
+		if (seconds < 10)
+			sec = "0" + seconds;
 		
+		return  min + ":" + sec;
+		//return minutes + ":" + seconds;
 	}
 	
 	//Adds one to number of song plays
