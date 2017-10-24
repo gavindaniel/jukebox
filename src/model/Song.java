@@ -15,18 +15,18 @@ public class Song {
 	
 	private String title;
 	private String artist;
-	private int length_s;		//In seconds
-	private String length;			// String version
+	private int length;		//In seconds
+	private String durationInMins;	//String version of length with format MM:SS
 	private String filePath;
 	private int numTimesPlayed;
 	private LocalDate mostRecentPlay;
 	
-	public Song (String title, String artist, int length_s, String filePath) {
+	public Song (String title, String artist, int length, String filePath) {
 		
 		this.title = title;
 		this.artist = artist;
-		this.length_s = length_s;
-		this.length = toMinutes(length_s);
+		this.length = length;
+		this.durationInMins = this.toMinutes();
 		this.filePath = "songfiles/" + filePath;
 		this.numTimesPlayed = 0;
 		this.mostRecentPlay = LocalDate.now();
@@ -43,7 +43,7 @@ public class Song {
 	
 	//returns Seconds
 	public int getSongLength() {
-		return this.length_s;
+		return this.length;
 	}
 	
 	public String getFilePath() {
@@ -55,6 +55,9 @@ public class Song {
 	public LocalDate getMostRecentPlay() {
 		return this.mostRecentPlay;
 	}
+	public String getDurationInMins() {
+		return this.durationInMins;
+	}
 	
 	public void setMostRecentPlay(LocalDate date) {
 		this.mostRecentPlay = date;
@@ -64,20 +67,15 @@ public class Song {
 		this.numTimesPlayed = n;
 	}
 	
-	public String toMinutes(int s) {
+	public String toMinutes() {
 		
-		int minutes = (s / 60);
-		int seconds = s % 60;
-		String min = "" + minutes;
-		String sec = "" + seconds;
+		int minutes = length / 60;
+		int seconds = length % 60;
 		
-		if (minutes < 10)
-			min = "0" + minutes;
-		if (seconds < 10)
-			sec = "0" + seconds;
+		String secStr = String.format("%02d", seconds);
 		
-		return  min + ":" + sec;
-		//return minutes + ":" + seconds;
+		return  minutes + ":" + secStr;
+		
 	}
 	
 	//Adds one to number of song plays

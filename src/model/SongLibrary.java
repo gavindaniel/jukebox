@@ -25,7 +25,7 @@ public class SongLibrary extends TableView<Song> {
 		TableColumn <Song, String> timeColumn = new TableColumn<>("Time");
 			timeColumn.setMaxWidth(60);
 			timeColumn.setMinWidth(60);
-			timeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("length"));
+			timeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("durationInMins"));
 		// add columns to table
 		this.getColumns().addAll(playsColumn,titleColumn,artistColumn,timeColumn);
 	}
