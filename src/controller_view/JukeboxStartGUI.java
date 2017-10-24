@@ -1,16 +1,5 @@
 package controller_view;
 
-
-import java.util.ArrayList;
-
-/**
- * This program is a functional spike to determine the interactions are 
- * actually working. It is an event-driven program with a graphical user
- * interface to affirm the functionality all Iteration 1 tasks have been 
- * completed and are working correctly. This program will be used to 
- * test your code for the first 100 points of the JukeBox project.
- */
-
 // Given by Rick
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -18,7 +7,6 @@ import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -26,21 +14,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import model.Song;
-import model.SongLibrary;
-import model.SongPlayer;
-import model.SongQueue;
-// Added by Gavin
-import model.User;
+import model.*;
 
 /**
  * Provides GUI to view and control a jukebox.
@@ -67,15 +47,13 @@ public class JukeboxStartGUI extends Application {
 	private Button login_button;
 	private Button logout_button;
 	private Button addSong_button;
-	// Song Library
+	// Song Library & Song Queue
 	private static SongLibrary song_library = new SongLibrary();
-	// ListView for song queue
-//	private TableView<Song> song_library;
+	// ObservableLists
 	private ListView<String> song_queue;
 	private ObservableList<Song> songs_in_library;
 	private ObservableList<String> songs_in_queue;
-	// List of Users 
-	private ArrayList<User> userList;
+	private UserCollection users;
 	// login tracker(s)
 	private User currentUser;
 	private User previousUser;
@@ -87,7 +65,7 @@ public class JukeboxStartGUI extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		populateUserList();
+		users = new UserCollection();
 		layoutGUI_setupModel(primaryStage);
 	}
 	  
@@ -177,14 +155,8 @@ public class JukeboxStartGUI extends Application {
 		buttonBox.getChildren().add(addSong_button);
 		buttonBox.setSpacing(15);
 		
-		//Setting width of buttons to be equal
-		for (Node node : buttonBox.getChildren()) {
-			Button button = (Button) node;
-			button.setMaxWidth(500);
-		}
-		
 		//Register handlers for buttons
-		registerButtonListeners();
+		addSong_button.setOnAction(new SongButtonListener());
 		
 		//Add list and button to bottomBox
 		bottomBox.getChildren().add(song_queue);
@@ -198,7 +170,6 @@ public class JukeboxStartGUI extends Application {
 		
 		//Play any existing songs from old playlist
 		startQueue();
-
 	}
 	
 	private void startQueue() {
@@ -209,97 +180,15 @@ public class JukeboxStartGUI extends Application {
     			SongPlayer songPlayer = new SongPlayer(nextSong);
     				songPlayer.playSong();
     				songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-    		}
-		
+    		}	
 	}
 	
 	private void removeUserQueue() {
-		
 		all.setBottom(null);
 		bottomBox.getChildren().clear();
 		buttonBox.getChildren().clear();
 	}
-		
-	//Called from the start to populates the UserList 
-	private void populateUserList() {
-		userList = new ArrayList<User>();
-		userList.add(new User("Chris",1,false));
-		userList.add(new User("Devon",22,false));
-		userList.add(new User("River",333,false));
-		userList.add(new User("Ryan",4444,false));
-		userList.add(new User("Merlin",7777777,true));
-	}
 	
-	
-
-	// called from the start to register song button listeners to the model
-	private void registerButtonListeners() {
-		addSong_button.setOnAction(new SongButtonListener());
-	}
-	
-	
-	
-	// function used in LoginButtonListener to verify the user exists in the UserList
-	private User findUser(String username, String password) {
-		  
-		try {
-			int pswrd = Integer.parseInt(password);
-			for (int i = 0; i < userList.size(); i++){
-				if ((userList.get(i).getID().equals(username)) && (userList.get(i).getPassword() == pswrd))
-				{
-					userList.get(i).setNumLogins(userList.get(i).getNumLogins()+1);
-					return userList.get(i); 
-				}
-			}
-		}
-		catch (Exception e){
-			System.out.println("*** EXCEPTION THROWN: " + e.getMessage());
-		}
-		
-		return null;
-	}
-	
-	// function to check if Username is already taken
-	private boolean checkUsernameTaken(String username) {
-		for (int i = 0; i < userList.size(); i++){
-			if ((userList.get(i).getID().equals(username)))
-				return true;
-		}
-		return false;
-	}
-	
-	// function to check if Username is already taken
-	private void addUser(String username, String password) {
-		try {
-			int pswrd = Integer.parseInt(password);
-			User newUser = new User(username,pswrd,false);
-			userList.add(newUser);
-			login_response.setText("User (" + username + ") added.");
-		}
-		catch (Exception e){
-			System.out.println("*** EXCEPTION THROWN: " + e.getMessage());
-			login_response.setText("Enter a valid password");
-		}
-		
-	}
-		
-	// function to check if Username is already taken
-	private void removeUser(String username) {
-		for (int i = 0; i < userList.size(); i++){
-			if ((userList.get(i).getID().equals(username)))
-			{
-				if (userList.get(i).getAdminAccess() == false) {
-					userList.remove(i);
-					newAlertMessage("Success", "User (" + username + ") removed.");
-				}
-				else
-					newAlertMessage("Failed", "Cannot remove admin (" + username + ")");
-				
-				return;
-			}
-		}
-	}
-		
 	private void newAlertMessage(String allowed, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(allowed);
@@ -343,16 +232,16 @@ public class JukeboxStartGUI extends Application {
 	private class LoginButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			String acct_name_input = name_input.getText();
-			String acct_password_input = pswrd_input.getText();
+			String username_input = name_input.getText();
+			String password_input = pswrd_input.getText();
 			// check if the user filled in both input fields
-			if (acct_name_input.equals("") || acct_password_input.equals("")){
+			if (username_input.equals("") || password_input.equals("")){
 				newAlertMessage("Failed", "Missing username/password.");
 				return;
 			}
 			// check if someone is already logged in before trying to log-in
 			if (currentUser == null) {
-				currentUser = findUser(acct_name_input, acct_password_input);
+				currentUser = users.findUser(username_input, password_input);
 				if (currentUser != null) 
 					setupUserQueue();
 			}
@@ -362,7 +251,7 @@ public class JukeboxStartGUI extends Application {
 			}
 			// if no one is logged in, check if the user attempting to login actually exists
 			if (currentUser != null){
-				login_response.setText("Hello! " + acct_name_input);
+				login_response.setText("Hello! " + username_input);
 				num_login_attempts = 0;
 				clearInputs();
 				if (currentUser.getAdminAccess())
@@ -398,25 +287,23 @@ public class JukeboxStartGUI extends Application {
 	private class AddButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			String acct_name_input = name_input.getText();
-			String acct_password_input = pswrd_input.getText();
+			String username_input = name_input.getText();
+			String password_input = pswrd_input.getText();
 			User current = null;
 			
-			if (acct_name_input.equals("") || acct_password_input.equals("")){
+			if (username_input.equals("") || password_input.equals("")){
 				newAlertMessage("Failed", "Missing username/password.");
 				return; 
 			}
+			if ( users.checkUsernameTaken(username_input) ) {
+				newAlertMessage("Failed", "Username (" + username_input + ") already taken.");
+				return;
+			}
 			
-			boolean usernameTaken = checkUsernameTaken(acct_name_input);
-			
-			if (usernameTaken) 
-				newAlertMessage("Failed", "Username (" + acct_name_input + ") already taken.");
-			else 
-				current = findUser(acct_name_input, acct_password_input);
-			
+			current = users.findUser(username_input, password_input);
 			if (current == null){ // User does not exist
-				addUser(acct_name_input, acct_password_input);
-				newAlertMessage("Success", "User (" + acct_name_input + ") successfully added.");
+				users.add(username_input, password_input);
+				newAlertMessage("Success", "User (" + username_input + ") successfully added.");
 				clearInputs();
 			}
 		}
@@ -426,20 +313,17 @@ public class JukeboxStartGUI extends Application {
 	private class RemoveButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
+			String username_input = name_input.getText();
 			
-			String acct_name_input = name_input.getText();
-			
-			if (acct_name_input.equals("")){
+			if (username_input.equals("")){
 				newAlertMessage("Failed", "Missing username.");
-				return; // EXIT : ERROR
+				return; 
 			}
 			
-			boolean userExists = checkUsernameTaken(acct_name_input);
-			
-			if (userExists)
-				removeUser(acct_name_input);
+			if ( users.checkUsernameTaken(username_input) )
+				users.remove(username_input);
 			else
-				newAlertMessage("Failed", "User (" + acct_name_input + ") Does Not Exist!");
+				newAlertMessage("Failed", "User (" + username_input + ") Does Not Exist!");
 
 			clearInputs();
 		}
@@ -460,7 +344,6 @@ public class JukeboxStartGUI extends Application {
 				String addStatus = currentQueue.addSong(song);
 				
 				if (addStatus.compareTo("Success") == 0) {
-					
 					if (song.getTitle().length() > 16)
 						songs_in_queue.add(song.getTitle() + "\t" + song.toMinutes(song.getSongLength()));
 					
@@ -521,7 +404,7 @@ public class JukeboxStartGUI extends Application {
 		    	}
 	    	
 	    }
-	  }
+	}
 	
 	
 	
