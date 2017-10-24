@@ -143,7 +143,7 @@ public class JukeboxStartGUI extends Application {
 		song_queue = new ListView<String>();
 		//Add any songs previously present in user playlist to queue
 		for (Song song : currentUser.getSongQueue().getQueueOfSongs()) {
-			songs_in_queue.add( song.getTitle() + "\t" + song.toMinutes( song.getSongLength() ) );
+			songs_in_queue.add( song.getTitle());
 		}
 		song_queue.setItems(songs_in_queue);
 		
@@ -344,15 +344,9 @@ public class JukeboxStartGUI extends Application {
 				String addStatus = currentQueue.addSong(song);
 				
 				if (addStatus.compareTo("Success") == 0) {
-					if (song.getTitle().length() > 16)
-						songs_in_queue.add(song.getTitle() + "\t" + song.toMinutes(song.getSongLength()));
-					
-					else if (song.getTitle().length() < 17 && song.getTitle().length() > 12)
-						songs_in_queue.add(song.getTitle() + "\t\t" + song.toMinutes(song.getSongLength()));
-					
-					else if (song.getTitle().length() < 13 && song.getTitle().length() > 7)
-						songs_in_queue.add(song.getTitle() + "\t\t\t" + song.toMinutes(song.getSongLength()));
-					
+
+					songs_in_queue.add(song.getTitle());
+
 					if (currentQueue.getQueueOfSongs().size() == 1) {
 						SongPlayer songPlayer = new SongPlayer(song);
 						songPlayer.playSong();
