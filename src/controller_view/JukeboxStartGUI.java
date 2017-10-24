@@ -60,7 +60,6 @@ public class JukeboxStartGUI extends Application {
 	private UserCollection users;
 	// login tracker(s)
 	private User currentUser;
-	private User previousUser;
 	private int num_login_attempts;
 	
 	public static void main(String[] args) {
@@ -81,7 +80,6 @@ public class JukeboxStartGUI extends Application {
 		buttonBox = new VBox();
 		bottomBox = new HBox();
 		currentUser = null;
-		previousUser = null;
 		
 		setupLoginView();
 		
@@ -127,16 +125,8 @@ public class JukeboxStartGUI extends Application {
 	
 	// constructs song List
 	private void populateSongLibrary() {
-			ObservableList<Song> songPlayList = FXCollections.observableArrayList(
-				new Song("Pokemon Capture","Pikachu",5,"Capture.wav"),
-				new Song("Danse Macabre","Kevin MacLeod",34,"DanseMacabreViolinHook.wav"),
-				new Song("Determined Tumbao","FreePlay Music",20,"DeterminedTumbao.wav"),
-				new Song("Loping Sting","Kevin MacLeod",5,"LopingSting.wav"),
-				new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.wav"),
-				new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.wav"),
-				new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.wav"));
-			
-			songLibrary.setItems(songPlayList);
+		ObservableList<Song> songPlayList = FXCollections.observableArrayList(currentUser.getSongPlayList());
+		songLibrary.setItems(songPlayList);
 	}
 	
 	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
@@ -277,7 +267,6 @@ public class JukeboxStartGUI extends Application {
 				if (currentUser.getAdminAccess()) 
 					removeAdminButtons();
 				
-				previousUser = currentUser;
 				currentUser = null;
 				removeUserQueue();
 			}

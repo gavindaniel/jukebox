@@ -1,5 +1,7 @@
 package model;
 
+import java.util.ArrayList;
+
 /**
  * Stores and manages user account information and privileges.
  * 
@@ -7,11 +9,13 @@ package model;
  *
  */
 public class User {
+
 	private String ID;
 	private int password;
 	private boolean admin_access;
 	private int num_logins;
 	private SongQueue mySongQueue;
+	private ArrayList<Song> songPlayList;
 	
 	// default constructor
 	public User() {
@@ -20,6 +24,8 @@ public class User {
 		this.admin_access = false;
 		this.num_logins = 0;
 		this.mySongQueue = new SongQueue(false);
+		this.songPlayList = new ArrayList<>(7);
+		initializeSongPlayListDefault();
 	}
 	// pre-defined constructor
 	public User(String id, int pswrd, boolean admin){
@@ -28,6 +34,8 @@ public class User {
 		this.admin_access = admin;
 		this.num_logins = 0;
 		this.mySongQueue = new SongQueue(admin);
+		this.songPlayList = new ArrayList<>(7);
+		initializeSongPlayListDefault();
 	}
 	
 	public String getID() {
@@ -48,6 +56,20 @@ public class User {
 	public void setNumLogins(int n) {
 		this.num_logins = n;
 	}
-	
-	
+	public ArrayList<Song> getSongPlayList() {
+		return this.songPlayList;
+	}
+	public boolean addToSongPlayList(Song song) {
+		return this.songPlayList.add(song);
+	}
+	private void initializeSongPlayListDefault() {
+		
+		addToSongPlayList(new Song("Pokemon Capture","Pikachu",5,"Capture.wav"));
+		addToSongPlayList(new Song("Danse Macabre","Kevin MacLeod",34,"DanseMacabreViolinHook.wav"));
+		addToSongPlayList(new Song("Determined Tumbao","FreePlay Music",20,"DeterminedTumbao.wav"));
+		addToSongPlayList(new Song("Loping Sting","Kevin MacLeod",5,"LopingSting.wav"));
+		addToSongPlayList(new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.wav"));
+		addToSongPlayList(new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.wav"));
+		addToSongPlayList(new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.wav"));
+	}
 }

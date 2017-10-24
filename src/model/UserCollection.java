@@ -1,12 +1,9 @@
 package model;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-import javafx.collections.FXCollections;
-
-public class UserCollection implements Serializable {
+public class UserCollection {
 
 	private List<User> theUsers;
 	
