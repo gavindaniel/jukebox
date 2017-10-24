@@ -53,11 +53,10 @@ public class JukeboxStartGUI extends Application {
 	private Button logout_button;
 	private Button addSong_button;
 	// Song Library & Song Queue
-	private static SongLibrary song_library = new SongLibrary();
+	private static SongLibrary songLibrary = new SongLibrary();
 	// ObservableLists
-	private ListView<String> song_queue;
-	private ObservableList<Song> songs_in_library;
-	private ObservableList<String> songs_in_queue;
+	private ListView<String> songListView;
+	private ObservableList<String> songsInQueue;
 	private UserCollection users;
 	// login tracker(s)
 	private User currentUser;
@@ -128,29 +127,29 @@ public class JukeboxStartGUI extends Application {
 	
 	// constructs song List
 	private void populateSongLibrary() {
-			songs_in_library = FXCollections.observableArrayList(
-				new Song("Pokemon Capture","Pikachu",5,"Capture.mp3"),
-				new Song("Danse Macabre","Kevin MacLeod",34,"DanseMacabreViolinHook.mp3"),
-				new Song("Determined Tumbao","FreePlay Music",20,"DeterminedTumbao.mp3"),
-				new Song("Loping Sting","Kevin MacLeod",5,"LopingSting.mp3"),
-				new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.mp3"),
-				new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.mp3"),
-				new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.mp3"));
+			ObservableList<Song> songPlayList = FXCollections.observableArrayList(
+				new Song("Pokemon Capture","Pikachu",5,"Capture.wav"),
+				new Song("Danse Macabre","Kevin MacLeod",34,"DanseMacabreViolinHook.wav"),
+				new Song("Determined Tumbao","FreePlay Music",20,"DeterminedTumbao.wav"),
+				new Song("Loping Sting","Kevin MacLeod",5,"LopingSting.wav"),
+				new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.wav"),
+				new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.wav"),
+				new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.wav"));
 			
-			song_library.setItems(songs_in_library);
+			songLibrary.setItems(songPlayList);
 	}
 	
 	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
-	private void setupUserQueue() {
+	private void setupUserDashboard() {
 
 		//Set up ListView for song queue
-		songs_in_queue = FXCollections.observableArrayList();
-		song_queue = new ListView<String>();
+		songsInQueue = FXCollections.observableArrayList();
+		songListView = new ListView<String>();
 		//Add any songs previously present in user playlist to queue
 		for (Song song : currentUser.getSongQueue().getQueueOfSongs()) {
-			songs_in_queue.add( song.getTitle());
+			songsInQueue.add( song.getTitle());
 		}
-		song_queue.setItems(songs_in_queue);
+		songListView.setItems(songsInQueue);
 		
 		// initialize Song Library
 		populateSongLibrary();
@@ -165,9 +164,9 @@ public class JukeboxStartGUI extends Application {
 		
 		//Add list and button to bottomBox
 
-		bottomBox.getChildren().add(song_queue);
+		bottomBox.getChildren().add(songListView);
 		bottomBox.getChildren().add(buttonBox);
-		bottomBox.getChildren().add(song_library);
+		bottomBox.getChildren().add(songLibrary);
 		bottomBox.setSpacing(30);
 		bottomBox.setPadding(new Insets(40,0,0,0));
 		
@@ -175,17 +174,17 @@ public class JukeboxStartGUI extends Application {
 		all.setBottom(bottomBox);
 		
 		//Play any existing songs from old playlist
-		startQueue();
+		startPlayingQueue();
 	}
 	
-	private void startQueue() {
+	private void startPlayingQueue() {
 		
 		Song nextSong = currentUser.getSongQueue().serveNextSong();
 		
 		if (nextSong != null) {
-    			SongPlayer songPlayer = new SongPlayer(nextSong);
-    				songPlayer.playSong();
-    				songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+			SongPlayer songPlayer = new SongPlayer(nextSong);
+			songPlayer.playSong();
+			songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
     		}	
 	}
 	
@@ -195,9 +194,9 @@ public class JukeboxStartGUI extends Application {
 		buttonBox.getChildren().clear();
 	}
 	
-	private void newAlertMessage(String allowed, String message) {
+	private void newAlertMessage(String title, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
-		alert.setTitle(allowed);
+		alert.setTitle(title);
 		alert.setHeaderText(message);
 		alert.showAndWait();
 	}
@@ -233,7 +232,6 @@ public class JukeboxStartGUI extends Application {
 	
 /**********************   Button Listeners   *****************************/	
 	
-	
 	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
 	private class LoginButtonListener implements EventHandler<ActionEvent> {
 		@Override
@@ -249,7 +247,7 @@ public class JukeboxStartGUI extends Application {
 			if (currentUser == null) {
 				currentUser = users.findUser(username_input, password_input);
 				if (currentUser != null) 
-					setupUserQueue();
+					setupUserDashboard();
 			}
 			else {
 				newAlertMessage("Failed", "logout first -> (" + currentUser.getID() + ")");
@@ -344,14 +342,14 @@ public class JukeboxStartGUI extends Application {
 		public void handle(ActionEvent event) {
 			
 			try {
-				song = song_library.getSelectionModel().getSelectedItem();
+				song = songLibrary.getSelectionModel().getSelectedItem();
 				
 				SongQueue currentQueue = currentUser.getSongQueue();
 				String addStatus = currentQueue.addSong(song);
 				
 				if (addStatus.compareTo("Success") == 0) {
 
-					songs_in_queue.add(song.getTitle());
+					songsInQueue.add(song.getTitle());
 
 					if (currentQueue.getQueueOfSongs().size() == 1) {
 						SongPlayer songPlayer = new SongPlayer(song);
@@ -363,7 +361,8 @@ public class JukeboxStartGUI extends Application {
 				else {
 					newAlertMessage("Failed", addStatus);
 				}
-				song_queue.refresh();
+				songLibrary.refresh();
+				songListView.refresh();
 			}
 			
 			catch (NullPointerException e){
@@ -380,18 +379,13 @@ public class JukeboxStartGUI extends Application {
 		    	
 		    	//If-Else Handles case where user logs out during song playback
 		    	if (currentUser != null) {
-		    		Song s = currentUser.getSongQueue().removeLastPlayedSong();
-		    		s.incrementNumPlays();
-		    		songs_in_queue.remove(0);
+		    		currentUser.getSongQueue().removeLastPlayedSong();
+		    		songsInQueue.remove(0);
 		    		playNextSong();
 		    	}
 		    	
-		    	else {
-		    		previousUser.getSongQueue().removeLastPlayedSong();
-		    	}
-		    	
-		    	song_library.refresh();
-		    	song_queue.refresh();
+		    	songLibrary.refresh();
+		    	songListView.refresh();
 	    }
 	    
 	    private void playNextSong() {
@@ -402,7 +396,6 @@ public class JukeboxStartGUI extends Application {
 					songPlayer.playSong();
 					songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
 		    	}
-	    	
 	    }
 	}
 	

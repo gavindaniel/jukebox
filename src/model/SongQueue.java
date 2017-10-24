@@ -67,9 +67,8 @@ public class SongQueue {
 		if (valid == 0) {
 			queueOfSongs.add(song);
 			NumSongsSelected++;
-			timeRemaining -= song.getSongLength();
-//			song.incrementNumPlays();
-			
+			song.incrementNumPlays();
+			timeRemaining -= song.getSongLength();			
 			return "Success";
 		}
 		
