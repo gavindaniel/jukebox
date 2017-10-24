@@ -69,12 +69,12 @@ public class User implements Serializable {
 	}
 	private void initializeSongPlayListDefault() {
 		
-		addToSongPlayList(new Song("Pokemon Capture","Pikachu",5,"Capture.wav"));
-		addToSongPlayList(new Song("Danse Macabre","Kevin MacLeod",34,"DanseMacabreViolinHook.wav"));
-		addToSongPlayList(new Song("Determined Tumbao","FreePlay Music",20,"DeterminedTumbao.wav"));
-		addToSongPlayList(new Song("Loping Sting","Kevin MacLeod",5,"LopingSting.wav"));
-		addToSongPlayList(new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.wav"));
-		addToSongPlayList(new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.wav"));
-		addToSongPlayList(new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.wav"));
+		addToSongPlayList(new Song("Pokemon Capture","Pikachu",5,"Capture.mp3"));
+		addToSongPlayList(new Song("Danse Macabre","Kevin MacLeod",34,"DanseMacabreViolinHook.mp3"));
+		addToSongPlayList(new Song("Determined Tumbao","FreePlay Music",20,"DeterminedTumbao.mp3"));
+		addToSongPlayList(new Song("Loping Sting","Kevin MacLeod",5,"LopingSting.mp3"));
+		addToSongPlayList(new Song("Swing Cheese","FreePlay Music",15,"SwingCheese.mp3"));
+		addToSongPlayList(new Song("The Curtain Rises","Kevin Macleod",28,"TheCurtainRises.mp3"));
+		addToSongPlayList(new Song("Untameable Fire","Pierre Langer",262,"UntabeableFire.mp3"));
 	}
 }
