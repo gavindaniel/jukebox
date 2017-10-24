@@ -3,30 +3,52 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Container for all user account and associated methods to 
+ * add, find, and remove user accounts.
+ * 
+ * @author Abdullah Asaad and Gavin Daniel
+ *
+ */
 public class UserCollection {
 
 	private List<User> theUsers;
-	
-	public UserCollection() {
-	    theUsers = new ArrayList<User>();
-	    setUpDefaultList();
-	  }
 
-	  /**
-	   * Initializes the list with seven (7) hard-coded students
-	   */
-	  private void setUpDefaultList() {
-		  theUsers.add(new User("Chris",1,false));
-		  theUsers.add(new User("Devon",22,false));
-		  theUsers.add(new User("River",333,false));
-		  theUsers.add(new User("Ryan",4444,false));
-		  theUsers.add(new User("Merlin",7777777,true));
-	  }
-	  
+	/**
+	 * Default Constructor. Initialize user list with original accounts
+	 */
+	public UserCollection() {
+		theUsers = new ArrayList<User>();
+		setUpDefaultList();
+	}
+
+	/**
+	 * Alternative constructor initializes user list with given parameter.
+	 * To be used with persistence.
+	 */
+	public UserCollection(List<User> userList) {
+		this.theUsers = new ArrayList<>(userList);
+	}
+
+	/**
+	 * Initializes the list with seven (7) hard-coded students
+	 */
+	private void setUpDefaultList() {
+		theUsers.add(new User("Chris",1,false));
+		theUsers.add(new User("Devon",22,false));
+		theUsers.add(new User("River",333,false));
+		theUsers.add(new User("Ryan",4444,false));
+		theUsers.add(new User("Merlin",7777777,true));
+	}
+	
+	public List<User> getUserList() {
+		return this.theUsers;
+	}
+
 	public int size() {
 		return theUsers.size();
 	}
-	
+
 	public void add(String username, String password) {
 		try {
 			int pswrd = Integer.parseInt(password);
@@ -42,7 +64,7 @@ public class UserCollection {
 	public User get(int index) {
 		return theUsers.get(index);
 	}
-	
+
 	// function to check if Username is already taken
 	public void remove(String username) {
 		for (int i = 0; i < theUsers.size(); i++){
@@ -50,19 +72,19 @@ public class UserCollection {
 			{
 				if (theUsers.get(i).getAdminAccess() == false) {
 					theUsers.remove(i);
-//					newAlertMessage("Success", "User (" + username + ") removed.");
+					//					newAlertMessage("Success", "User (" + username + ") removed.");
 				}
 				else
-//					newAlertMessage("Failed", "Cannot remove admin (" + username + ")");
-				
-				return;
+					//					newAlertMessage("Failed", "Cannot remove admin (" + username + ")");
+
+					return;
 			}
 		}
 	}
-	
+
 	// function used in LoginButtonListener to verify the user exists in the UserList
 	public User findUser(String username, String password) {
-		  
+
 		try {
 			int pswrd = Integer.parseInt(password);
 			for (int i = 0; i < this.size(); i++){
@@ -78,7 +100,7 @@ public class UserCollection {
 		}
 		return null;
 	}
-	
+
 
 	// function to check if Username is already taken
 	public boolean checkUsernameTaken(String username) {

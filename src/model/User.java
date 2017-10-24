@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
@@ -8,8 +9,12 @@ import java.util.ArrayList;
  * @author Abdullah Asaad, Gavin Daniel
  *
  */
-public class User {
+public class User implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -2311068485430113718L;
 	private String ID;
 	private int password;
 	private boolean admin_access;

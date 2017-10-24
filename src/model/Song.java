@@ -2,6 +2,7 @@ package model;
 // Added to allow package model to exist on GitHub
 
 import java.io.File;
+import java.io.Serializable;
 import java.time.LocalDate;
 
 
@@ -11,8 +12,12 @@ import java.time.LocalDate;
  * @author Abdullah Asaad, Gavin Daniel
  *
  */
-public class Song {
+public class Song implements Serializable {
 	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 3690602724841979159L;
 	private String title;
 	private String artist;
 	private int length;		//In seconds

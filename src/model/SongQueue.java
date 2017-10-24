@@ -1,5 +1,6 @@
 package model;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -10,8 +11,12 @@ import java.util.Queue;
  * @author Abdullah Asaad, Gavin Daniel
  *
  */
-public class SongQueue {
+public class SongQueue implements Serializable {
 
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -7063933830695792380L;
 	private Queue<Song> queueOfSongs;
 	private int NumSongsSelected;
 	private int timeRemaining;	//Seconds

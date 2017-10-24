@@ -1,5 +1,7 @@
 package controller_view;
 
+import java.util.Optional;
+
 // Given by Rick
 import javafx.application.Application;
 import javafx.collections.FXCollections;
@@ -11,6 +13,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.PasswordField;
@@ -20,12 +23,14 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.WindowEvent;
 import model.Song;
 import model.SongLibrary;
 import model.SongPlayer;
 import model.SongQueue;
 import model.User;
 import model.UserCollection;
+import model.UserPersistence;
 
 /**
  * Provides GUI to view and control a jukebox.
@@ -68,8 +73,28 @@ public class JukeboxStartGUI extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		users = new UserCollection();
+		initializeListOfUsers();
 		layoutGUI_setupModel(primaryStage);
+	}
+	
+	/**
+	 * Sets up the list of user accounts to be used in jukebox.
+	 * User list can be assigned default values 
+	 * or may retain previous values through persistance.
+	 */
+	private void initializeListOfUsers() {
+
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("Start Up Option");
+		alert.setHeaderText("Press ok to read persistent object(s)");
+		alert.setContentText("Press cancel while system testing.");
+		Optional<ButtonType> result = alert.showAndWait();
+
+		if (result.get() == ButtonType.OK) {
+			users = new UserCollection(UserPersistence.readPersistedObject());
+		} else {
+			users = new UserCollection();
+		}
 	}
 	  
 	//Place components
@@ -86,6 +111,9 @@ public class JukeboxStartGUI extends Application {
 		Scene scene = new Scene(all, 700, 500);
 		stage.setScene(scene);
 		stage.show();
+		
+		// Prompts user with option to save the current state of users as a persistent object.
+	    stage.setOnCloseRequest(new WritePersistentObject());
 	}
 	
 	private void setupLoginView() {
@@ -387,6 +415,28 @@ public class JukeboxStartGUI extends Application {
 		    	}
 	    }
 	}
+	
+	/**
+	 * Writes the current list of users, along with all user data, to file.
+	 * 
+	 * @author Abdullah Asaad and Gavin Daniel
+	 *
+	 */
+	private class WritePersistentObject implements EventHandler<WindowEvent> {
+
+	    @Override
+	    public void handle(WindowEvent event) {
+	      Alert alert = new Alert(AlertType.CONFIRMATION);
+	      alert.setTitle("Shut Down Option");
+	      alert.setHeaderText("Press ok to write persistent object(s)");
+	      alert.setContentText("Press cancel while system testing.");
+	      Optional<ButtonType> result = alert.showAndWait();
+
+	      if (result.get() == ButtonType.OK) {
+	        UserPersistence.writePersistedObject(users.getUserList());
+	      }
+	    }
+	  }
 	
 	
 	/*************** END of CLASS : JukeBoxStartGUI ****************/  
