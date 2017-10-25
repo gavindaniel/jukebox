@@ -13,9 +13,6 @@ import java.util.Queue;
  */
 public class SongQueue implements Serializable {
 
-	/**
-	 * 
-	 */
 	private static final long serialVersionUID = -7063933830695792380L;
 	private Queue<Song> queueOfSongs;
 	private int NumSongsSelected;
@@ -37,25 +34,13 @@ public class SongQueue implements Serializable {
 	}
 	
 	// Getters and Setters
-	public Queue<Song> getQueueOfSongs() {
-		return this.queueOfSongs;
-	}
-	public int getNumSongsSelected() {
-		return this.NumSongsSelected;
-	}
-	public int getMinsRemaining() {
-		return this.timeRemaining/60;
-	}
-	public int getSecondsRemaining() {
-		return this.timeRemaining;
-	}
-	public LocalDate getMostRecentSelection() {
-		return this.mostRecentSelection;
-	}
+	public Queue<Song> getQueueOfSongs() {	return this.queueOfSongs;	}
+	public int getNumSongsSelected() {		return this.NumSongsSelected;	}
+	public int getMinsRemaining() {			return this.timeRemaining/60;	}
+	public int getSecondsRemaining() {		return this.timeRemaining;	}
+	public LocalDate getMostRecentSelection() {	return this.mostRecentSelection;	}
 	
-	public void setMostRecentSelection(LocalDate date) {
-		this.mostRecentSelection = date;
-	}
+	public void setMostRecentSelection(LocalDate date) {	this.mostRecentSelection = date;	 }
 	
 	/**
 	 * If song passes validation, it is added to the song queue to be played.

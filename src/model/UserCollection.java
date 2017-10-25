@@ -41,13 +41,9 @@ public class UserCollection {
 		theUsers.add(new User("Merlin",7777777,true));
 	}
 	
-	public List<User> getUserList() {
-		return this.theUsers;
-	}
-
-	public int size() {
-		return theUsers.size();
-	}
+	public User get(int index) {		return theUsers.get(index);	}
+	public List<User> getUserList() {	return this.theUsers;	}
+	public int size() {	return theUsers.size();	}
 
 	public void add(String username, String password) {
 		try {
@@ -61,23 +57,16 @@ public class UserCollection {
 		}	
 	}
 
-	public User get(int index) {
-		return theUsers.get(index);
-	}
 
 	// function to check if Username is already taken
 	public void remove(String username) {
 		for (int i = 0; i < theUsers.size(); i++){
 			if ((theUsers.get(i).getID().equals(username)))
 			{
-				if (theUsers.get(i).getAdminAccess() == false) {
+				if (theUsers.get(i).getAdminAccess() == false) 
 					theUsers.remove(i);
-					//					newAlertMessage("Success", "User (" + username + ") removed.");
-				}
-				else
-					//					newAlertMessage("Failed", "Cannot remove admin (" + username + ")");
-
-					return;
+				
+				return;
 			}
 		}
 	}

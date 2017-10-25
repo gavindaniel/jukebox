@@ -16,16 +16,17 @@ public class SongPlayer {
 	private Media songMedia;
 	private static MediaPlayer mediaPlayer;
 	
+	// SongPlayer constructor
 	public SongPlayer(Song song) {			
 		this.song = song;
 		this.songMedia = new Media(this.song.getPlayableSource());
 		SongPlayer.mediaPlayer = new MediaPlayer(songMedia);
 	}
 	
-	public MediaPlayer getMediaPlayer() {
-		return SongPlayer.mediaPlayer;
-	}
+	// gets MediaPlayer
+	public MediaPlayer getMediaPlayer() {	return SongPlayer.mediaPlayer;	}
 	
+	// plays song in MediaPlayer
 	public void playSong() {
 		SongPlayer.mediaPlayer.play();
 	}

@@ -20,18 +20,22 @@ public class SongLibrary extends TableView<Song> {
 	@SuppressWarnings("unchecked")
 	public SongLibrary() {
 		// create table columns and add data
+		// Number of Plays Column
 		TableColumn <Song, Integer> playsColumn = new TableColumn<>("Plays");
 			playsColumn.setMaxWidth(50);
 			playsColumn.setMinWidth(50);
 			playsColumn.setCellValueFactory(new PropertyValueFactory<Song, Integer>("numTimesPlayed"));
+		// Title Column
 		TableColumn <Song, String> titleColumn = new TableColumn<>("Title");
 			titleColumn.setMaxWidth(150);
 			titleColumn.setMinWidth(150);
 			titleColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("title"));
+		// Artist column
 		TableColumn <Song, String> artistColumn = new TableColumn<>("Artist");
 			artistColumn.setMaxWidth(150);
 			artistColumn.setMinWidth(150);
 			artistColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("artist"));
+		// Time column
 		TableColumn <Song, String> timeColumn = new TableColumn<>("Time");
 			timeColumn.setMaxWidth(60);
 			timeColumn.setMinWidth(60);
