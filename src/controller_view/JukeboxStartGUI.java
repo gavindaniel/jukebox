@@ -341,8 +341,10 @@ public class JukeboxStartGUI extends Application {
 				return; 
 			}
 			
-			if ( users.checkUsernameTaken(username_input) )
+			if ( users.checkUsernameTaken(username_input) ) {
 				users.remove(username_input);
+				newAlertMessage("Success", "User (" + username_input + ") removed.");
+			}
 			else
 				newAlertMessage("Failed", "User (" + username_input + ") Does Not Exist!");
 
