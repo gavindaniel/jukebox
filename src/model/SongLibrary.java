@@ -28,5 +28,6 @@ public class SongLibrary extends TableView<Song> {
 			timeColumn.setCellValueFactory(new PropertyValueFactory<Song, String>("durationInMins"));
 		// add columns to table
 		this.getColumns().addAll(playsColumn,titleColumn,artistColumn,timeColumn);
+		this.setMaxWidth(412);
 	}
 }

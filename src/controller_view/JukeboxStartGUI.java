@@ -111,7 +111,7 @@ public class JukeboxStartGUI extends Application {
 		
 		setupLoginView();
 		
-		Scene scene = new Scene(all, 700, 500);
+		Scene scene = new Scene(all, 748, 500);
 		stage.setScene(scene);
 		stage.show();
 		
