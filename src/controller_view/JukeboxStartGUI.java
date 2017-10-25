@@ -71,6 +71,9 @@ public class JukeboxStartGUI extends Application {
 		launch(args);
 	}
 	
+	/**
+	 * Initializes the list of Users and setups the GUI
+	 */
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		initializeListOfUsers();
@@ -345,6 +348,7 @@ public class JukeboxStartGUI extends Application {
 				users.remove(username_input);
 				newAlertMessage("Success", "User (" + username_input + ") removed.");
 			}
+			
 			else
 				newAlertMessage("Failed", "User (" + username_input + ") Does Not Exist!");
 
