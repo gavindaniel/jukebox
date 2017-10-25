@@ -1,9 +1,15 @@
 package model;
 
-
 import javafx.scene.media.Media;
 import javafx.scene.media.MediaPlayer;
-
+/**
+ * File:  SongPlayer.java
+ * 
+ * Holds information related to the MediaPlayer and songs to be played
+ * 
+ * @author Abdullah Asaad, Gavin Daniel
+ *
+ */
 public class SongPlayer {
 	
 	private Song song;

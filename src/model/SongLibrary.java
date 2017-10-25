@@ -3,13 +3,23 @@ package model;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-
+/**
+ * File:  SongLibrary.java
+ * 
+ * Holds the library of songs to be picked from and queued
+ * 
+ * @author Abdullah Asaad, Gavin Daniel
+ *
+ */
 public class SongLibrary extends TableView<Song> {
 
-//	song_library.setEditable(false);
-	// create table columns
+	/*
+	 *   functionality:	Constructor for SongLibrary
+	 *   Parameters:		~
+	 */
 	@SuppressWarnings("unchecked")
 	public SongLibrary() {
+		// create table columns and add data
 		TableColumn <Song, Integer> playsColumn = new TableColumn<>("Plays");
 			playsColumn.setMaxWidth(50);
 			playsColumn.setMinWidth(50);
