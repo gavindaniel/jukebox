@@ -1,5 +1,6 @@
 package controller_view;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
 // Given by Rick
@@ -77,13 +78,14 @@ public class JukeboxStartGUI extends Application {
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		initializeListOfUsers();
+		resetUserPlayList();
 		layoutGUI_setupModel(primaryStage);
 	}
 	
 	/**
 	 * Sets up the list of user accounts to be used in jukebox.
 	 * User list can be assigned default values 
-	 * or may retain previous values through persistance.
+	 * or may retain previous values through persistence.
 	 */
 	private void initializeListOfUsers() {
 
@@ -97,6 +99,21 @@ public class JukeboxStartGUI extends Application {
 			users = new UserCollection(UserPersistence.readPersistedObject());
 		} else {
 			users = new UserCollection();
+		}
+	}
+	
+	/**
+	 * Resets number of plays per day and number of plays per song for each user.
+	 * Reset is effective at midnight of next day. Function is called at start of app.
+	 */
+	private void resetUserPlayList() {
+		for (User user : users.getUserList()) {
+			for (Song song : user.getSongPlayList()) {
+				if (song.getMostRecentPlay().compareTo(LocalDate.now()) < 0) {
+					song.setMostRecentPlay(LocalDate.now());
+					song.setNumTimesPlayed(0);
+				}
+			}
 		}
 	}
 	  
