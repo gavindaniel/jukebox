@@ -40,14 +40,14 @@ import model.UserPersistence;
  *
  */
 public class JukeboxStartGUI extends Application {
-  
+
 	// BorderPane, GridPanes, and HBox
 	private BorderPane all;
 	private VBox buttonBox;
 	private GridPane leftSide;
 	private GridPane rightSide;
 	private HBox bottomBox;
-	// Labels 
+	// Labels
 	private Label acct_name;
 	private Label acct_pswrd;
 	private Label login_response;
@@ -67,11 +67,11 @@ public class JukeboxStartGUI extends Application {
 	// login tracker(s)
 	private User currentUser;
 	private int num_login_attempts;
-	
+
 	public static void main(String[] args) {
 		launch(args);
 	}
-	
+
 	/**
 	 * Initializes the list of Users and setups the GUI
 	 */
@@ -81,11 +81,10 @@ public class JukeboxStartGUI extends Application {
 		resetUserPlayList();
 		layoutGUI_setupModel(primaryStage);
 	}
-	
+
 	/**
-	 * Sets up the list of user accounts to be used in jukebox.
-	 * User list can be assigned default values 
-	 * or may retain previous values through persistence.
+	 * Sets up the list of user accounts to be used in jukebox. User list can be
+	 * assigned default values or may retain previous values through persistence.
 	 */
 	private void initializeListOfUsers() {
 
@@ -101,10 +100,11 @@ public class JukeboxStartGUI extends Application {
 			users = new UserCollection();
 		}
 	}
-	
+
 	/**
 	 * Resets number of plays per day and number of plays per song for each user.
-	 * Reset is effective at midnight of next day. Function is called at start of app.
+	 * Reset is effective at midnight of next day. Function is called at start of
+	 * app.
 	 */
 	private void resetUserPlayList() {
 		for (User user : users.getUserList()) {
@@ -116,8 +116,13 @@ public class JukeboxStartGUI extends Application {
 			}
 		}
 	}
-	  
-	//Place components
+
+	/**
+	 * Lays out all the main containers in the GUI.
+	 * 
+	 * @param stage
+	 *            JavaFX main container
+	 */
 	private void layoutGUI_setupModel(Stage stage) {
 		all = new BorderPane();
 		leftSide = new GridPane();
@@ -125,17 +130,21 @@ public class JukeboxStartGUI extends Application {
 		buttonBox = new VBox();
 		bottomBox = new HBox();
 		currentUser = null;
-		
+
 		setupLoginView();
-		
+
 		Scene scene = new Scene(all, 748, 500);
 		stage.setScene(scene);
 		stage.show();
-		
-		// Prompts user with option to save the current state of users as a persistent object.
-	    stage.setOnCloseRequest(new WritePersistentObject());
+
+		// Prompts user with option to save the current state of users as a persistent
+		// object.
+		stage.setOnCloseRequest(new WritePersistentObject());
 	}
-	
+
+	/**
+	 * Displays login container.
+	 */
 	private void setupLoginView() {
 
 		name_input = new TextField();
@@ -145,101 +154,125 @@ public class JukeboxStartGUI extends Application {
 		logout_button = new Button("Logout");
 		acct_name = new Label("Account Name");
 		acct_pswrd = new Label("\tPassword");
-		
+
 		leftSide.setVgap(12);
 		leftSide.setHgap(20);
 		leftSide.add(acct_name, 1, 1);
 		leftSide.add(acct_pswrd, 1, 3);
 		leftSide.add(name_input, 2, 1);
 		leftSide.add(pswrd_input, 2, 3);
-	
+
 		rightSide.setVgap(11);
 		rightSide.add(login_button, 0, 1);
 		rightSide.add(login_response, 0, 2);
 		rightSide.add(logout_button, 0, 3);
-		rightSide.setPadding(new Insets(0,40,0,0));
-		
+		rightSide.setPadding(new Insets(0, 40, 0, 0));
+
 		all.setLeft(leftSide);
 		all.setRight(rightSide);
-		
+
 		registerLoginListeners();
 	}
-	
-	// called from the start to register login listeners to the model
+
+	/**
+	 * Register button listeners for login buttons.
+	 */
 	private void registerLoginListeners() {
 		login_button.setOnAction(new LoginButtonListener());
 		logout_button.setOnAction(new LogoutButtonListener());
 	}
-	
-	// constructs song List
+
+	/**
+	 * Displays available songs in table.
+	 */
 	private void populateSongLibrary() {
 		ObservableList<Song> songPlayList = FXCollections.observableArrayList(currentUser.getSongPlayList());
 		songLibrary.setItems(songPlayList);
 	}
-	
-	//Sets up song queue ListView as well as song selection buttons. Appears once user login.
+
+	/**
+	 * Displays user related containers: song queue, table of available songs, add
+	 * song button.
+	 */
 	private void setupUserDashboard() {
 
-		//Set up ListView for song queue
+		// Set up ListView for song queue
 		songsInQueue = FXCollections.observableArrayList();
 		songListView = new ListView<String>();
-		//Add any songs previously present in user playlist to queue
+		// Add any songs previously present in user playlist to queue
 		for (Song song : currentUser.getSongQueue().getQueueOfSongs()) {
-			songsInQueue.add( song.getTitle());
+			songsInQueue.add(song.getTitle());
 		}
 		songListView.setItems(songsInQueue);
-		
+
 		// initialize Song Library
 		populateSongLibrary();
-		
-		//Set up song selection buttons
+
+		// Set up song selection buttons
 		addSong_button = new Button("<");
 		buttonBox.getChildren().add(addSong_button);
 		buttonBox.setSpacing(15);
-		
-		//Register handlers for buttons
+
+		// Register handlers for buttons
 		addSong_button.setOnAction(new SongButtonListener());
-		
-		//Add list and button to bottomBox
+
+		// Add list and button to bottomBox
 
 		bottomBox.getChildren().add(songListView);
 		bottomBox.getChildren().add(buttonBox);
 		bottomBox.getChildren().add(songLibrary);
 		bottomBox.setSpacing(30);
-		bottomBox.setPadding(new Insets(40,0,0,0));
-		
-		//Add Box to bottom of borderPane
+		bottomBox.setPadding(new Insets(40, 0, 0, 0));
+
+		// Add Box to bottom of borderPane
 		all.setBottom(bottomBox);
-		
-		//Play any existing songs from old playlist
+
+		// Play any existing songs from old playlist
 		startPlayingQueue();
 	}
-	
+
+	/**
+	 * Starts playing a song immediately if queue is not empty upon login.
+	 */
 	private void startPlayingQueue() {
-		
+
 		Song nextSong = currentUser.getSongQueue().serveNextSong();
-		
+
 		if (nextSong != null) {
 			SongPlayer songPlayer = new SongPlayer(nextSong);
 			songPlayer.playSong();
 			songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-    		}	
+		}
 	}
-	
+
+	/**
+	 * Hides song queue from view.
+	 */
 	private void removeUserQueue() {
 		all.setBottom(null);
 		bottomBox.getChildren().clear();
 		buttonBox.getChildren().clear();
 	}
-	
+
+	/**
+	 * Template for generating alert windows.
+	 * 
+	 * @param title
+	 *            title of alert box
+	 * @param message
+	 *            body of alert
+	 */
 	private void newAlertMessage(String title, String message) {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setTitle(title);
 		alert.setHeaderText(message);
 		alert.showAndWait();
 	}
-	
-	// function to add the Add/Drop buttons for when an admin logs-in.
+
+	/**
+	 * Displays button concerned with admin functionality (i.e. add or remove
+	 * users).
+	 */
 	private void addAdminButtons() {
 		Button addButton = new Button("   Add User   ");
 		addButton.setOnAction(new AddButtonListener());
@@ -248,8 +281,10 @@ public class JukeboxStartGUI extends Application {
 		leftSide.add(addButton, 3, 1);
 		leftSide.add(removeButton, 3, 3);
 	}
-	
-	// function to remove the Add/Drop buttons for when an admin logs-out.
+
+	/**
+	 * Hides admin buttons.
+	 */
 	private void removeAdminButtons() {
 		all.setLeft(null);
 		leftSide = new GridPane();
@@ -261,132 +296,160 @@ public class JukeboxStartGUI extends Application {
 		leftSide.add(pswrd_input, 2, 3);
 		all.setLeft(leftSide);
 	}
-	// clears Inputs
-	private void clearInputs(){
+
+	/**
+	 * Clears any user input in login text boxes.
+	 */
+	private void clearInputs() {
 		name_input.clear();
 		pswrd_input.clear();
 	}
-	
-	
-/**********************   Button Listeners   *****************************/	
-	
-	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+
+	/********************** Button Listeners *****************************/
+
+	/**
+	 * Button Listener for Login button and calls verifyUser to see if the User
+	 * exists in the ArrayList.
+	 * 
+	 * @author Abdullah Asaad and Gavin Daniel
+	 *
+	 */
 	private class LoginButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
 			String username_input = name_input.getText();
 			String password_input = pswrd_input.getText();
 			// check if the user filled in both input fields
-			if (username_input.equals("") || password_input.equals("")){
+			if (username_input.equals("") || password_input.equals("")) {
 				newAlertMessage("Failed", "Missing username/password.");
 				return;
 			}
 			// check if someone is already logged in before trying to log-in
 			if (currentUser == null) {
 				currentUser = users.findUser(username_input, password_input);
-				if (currentUser != null) 
+				if (currentUser != null)
 					setupUserDashboard();
-			}
-			else {
+			} else {
 				newAlertMessage("Failed", "logout first -> (" + currentUser.getID() + ")");
 				return;
 			}
 			// if no one is logged in, check if the user attempting to login actually exists
-			if (currentUser != null){
+			if (currentUser != null) {
 				login_response.setText("Hello! " + username_input);
 				num_login_attempts = 0;
 				clearInputs();
 				if (currentUser.getAdminAccess())
 					addAdminButtons();
-			}
-			else {
+			} else {
 				num_login_attempts++;
-				newAlertMessage("Failed", "Incorrect. " + (3-num_login_attempts) + " attempt(s) left");
-			}	
+				newAlertMessage("Failed", "Incorrect. " + (3 - num_login_attempts) + " attempt(s) left");
+			}
 		}
 	}
-	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+
+	/**
+	 * Button Listener for Logout button. Modifies currentUser and hides all user
+	 * dashboard.
+	 * 
+	 * @author Abdullah Asaad and Gavin Daniel
+	 *
+	 */
 	private class LogoutButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
-			
-			if (currentUser != null){
+
+			if (currentUser != null) {
 				login_response.setText("Good-bye! " + currentUser.getID());
-				if (currentUser.getAdminAccess()) 
+				if (currentUser.getAdminAccess())
 					removeAdminButtons();
-				
+
 				currentUser = null;
 				removeUserQueue();
-			}
-			else 
-				newAlertMessage("Failed","Please login first.");
-			
+			} else
+				newAlertMessage("Failed", "Please login first.");
+
 		}
 	}
-	
-	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+
+	/**
+	 * Button Listener to enable addition of users by admin.
+	 * 
+	 * @author Abdullah Asaad and Gavin Daniel
+	 *
+	 */
 	private class AddButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
 			String username_input = name_input.getText();
 			String password_input = pswrd_input.getText();
 			User current = null;
-			
-			if (username_input.equals("") || password_input.equals("")){
+
+			if (username_input.equals("") || password_input.equals("")) {
 				newAlertMessage("Failed", "Missing username/password.");
-				return; 
+				return;
 			}
-			if ( users.checkUsernameTaken(username_input) ) {
+			if (users.checkUsernameTaken(username_input)) {
 				newAlertMessage("Failed", "Username (" + username_input + ") already taken.");
 				return;
 			}
-			
+
 			current = users.findUser(username_input, password_input);
-			if (current == null){ // User does not exist
+			if (current == null) { // User does not exist
 				users.add(username_input, password_input);
 				newAlertMessage("Success", "User (" + username_input + ") successfully added.");
 				clearInputs();
 			}
 		}
 	}
-	
-	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+
+	/**
+	 * Button Listener to enable removal of users by admin.
+	 * 
+	 * @author Abdullah Asaad and Gavin Daniel
+	 *
+	 */
 	private class RemoveButtonListener implements EventHandler<ActionEvent> {
 		@Override
 		public void handle(ActionEvent event) {
 			String username_input = name_input.getText();
-			
-			if (username_input.equals("")){
+
+			if (username_input.equals("")) {
 				newAlertMessage("Failed", "Missing username.");
-				return; 
+				return;
 			}
-			
-			if ( users.checkUsernameTaken(username_input) ) {
+
+			if (users.checkUsernameTaken(username_input)) {
 				users.remove(username_input);
 				newAlertMessage("Success", "User (" + username_input + ") removed.");
 			}
-			
+
 			else
 				newAlertMessage("Failed", "User (" + username_input + ") Does Not Exist!");
 
 			clearInputs();
 		}
 	}
-	
-	// Button Listener for Login button and calls verifyUser to see if the User exists in the ArrayList
+
+	/**
+	 * Button Listener facilitates adding a song from the library to the user queue
+	 * to be played. Class SongQueue handles all song validation.
+	 * 
+	 * @author Abdullah Asaad and Gavin Daniel
+	 *
+	 */
 	private class SongButtonListener implements EventHandler<ActionEvent> {
-		
+
 		private Song song;
-		
+
 		@Override
 		public void handle(ActionEvent event) {
-			
+
 			try {
 				song = songLibrary.getSelectionModel().getSelectedItem();
-				
+
 				SongQueue currentQueue = currentUser.getSongQueue();
 				String addStatus = currentQueue.addSong(song);
-				
+
 				if (addStatus.compareTo("Success") == 0) {
 
 					songsInQueue.add(song.getTitle());
@@ -397,70 +460,76 @@ public class JukeboxStartGUI extends Application {
 						songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
 					}
 				}
-				
+
 				else {
 					newAlertMessage("Failed", addStatus);
 				}
 				songLibrary.refresh();
 				songListView.refresh();
 			}
-			
-			catch (NullPointerException e){
+
+			catch (NullPointerException e) {
 				System.out.println("NullPointerException caught");
 				newAlertMessage("Failed", "Select a Song first");
-			}	
+			}
 		}
 	}
-	
-	
-	private class EndOfSongHandler implements Runnable {
-	    @Override
-	    public void run() {
-		    	
-		    	//If-Else Handles case where user logs out during song playback
-		    	if (currentUser != null) {
-		    		currentUser.getSongQueue().removeLastPlayedSong();
-		    		songsInQueue.remove(0);
-		    		playNextSong();
-		    	}
-		    	
-		    	songLibrary.refresh();
-		    	songListView.refresh();
-	    }
-	    
-	    private void playNextSong() {
-		    	Song nextSong = currentUser.getSongQueue().serveNextSong();
-		    	
-		    	if (nextSong != null) {
-		    		SongPlayer songPlayer = new SongPlayer(nextSong);
-					songPlayer.playSong();
-					songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
-		    	}
-	    }
-	}
-	
+
 	/**
-	 * Writes the current list of users, along with all user data, to file.
+	 * Handler is activated at the end of song. Provides functionality for removal
+	 * of a played song from queue.
+	 * 
+	 * @author Abdullah Asaad and Gavin Daniel
+	 *
+	 */
+	private class EndOfSongHandler implements Runnable {
+		@Override
+		public void run() {
+
+			// If-Else Handles case where user logs out during song playback
+			if (currentUser != null) {
+				currentUser.getSongQueue().removeLastPlayedSong();
+				songsInQueue.remove(0);
+				playNextSong();
+			}
+
+			songLibrary.refresh();
+			songListView.refresh();
+		}
+
+		private void playNextSong() {
+			Song nextSong = currentUser.getSongQueue().serveNextSong();
+
+			if (nextSong != null) {
+				SongPlayer songPlayer = new SongPlayer(nextSong);
+				songPlayer.playSong();
+				songPlayer.getMediaPlayer().setOnEndOfMedia(new EndOfSongHandler());
+			}
+		}
+	}
+
+	/**
+	 * Writes the current list of users, along with all user data, to file. Uses
+	 * Static method from UserPersistence class.
 	 * 
 	 * @author Abdullah Asaad and Gavin Daniel
 	 *
 	 */
 	private class WritePersistentObject implements EventHandler<WindowEvent> {
 
-	    @Override
-	    public void handle(WindowEvent event) {
-	      Alert alert = new Alert(AlertType.CONFIRMATION);
-	      alert.setTitle("Shut Down Option");
-	      alert.setHeaderText("Press ok to write persistent object(s)");
-	      alert.setContentText("Press cancel while system testing.");
-	      Optional<ButtonType> result = alert.showAndWait();
+		@Override
+		public void handle(WindowEvent event) {
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("Shut Down Option");
+			alert.setHeaderText("Press ok to write persistent object(s)");
+			alert.setContentText("Press cancel while system testing.");
+			Optional<ButtonType> result = alert.showAndWait();
 
-	      if (result.get() == ButtonType.OK) {
-	        UserPersistence.writePersistedObject(users.getUserList());
-	      }
-	    }
-	  }
-	
-	
-	/*************** END of CLASS : JukeBoxStartGUI ****************/  
+			if (result.get() == ButtonType.OK) {
+				UserPersistence.writePersistedObject(users.getUserList());
+			}
+		}
+	}
+
+	/*************** END of CLASS : JukeBoxStartGUI ****************/
 }

@@ -8,10 +8,21 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.List;
 
+/**
+ * Enables object persistence for users by writing to file on disk.
+ * 
+ * @author Abdullah Asaad
+ *
+ */
 public class UserPersistence {
 
 	private static String filePath = "listOfUsers";
 
+	/**
+	 * Reads persistent objects stored in file.
+	 * 
+	 * @return List of users from file
+	 */
 	@SuppressWarnings("unchecked")
 	public static List<User> readPersistedObject() {
 		List<User> userList = null;
@@ -31,8 +42,14 @@ public class UserPersistence {
 		return userList;
 	}
 
+	/**
+	 * Writes a list of users to file for persistence.
+	 * 
+	 * @param userList
+	 *            List of users to be stored
+	 */
 	public static void writePersistedObject(List<User> userList) {
-		
+
 		try {
 			FileOutputStream outBytes = new FileOutputStream(filePath);
 			ObjectOutputStream outFile = new ObjectOutputStream(outBytes);
